@@ -1,0 +1,20 @@
+Core
+	Deferred rendering
+Geometry
+	Parsing and rendering an exising model format
+	?
+Texture and lighting
+	Normal mapping
+		(occlusion)
+Projection techniques
+	Shadow volumes
+		(Shadow mapping, dynamic x mapping)
+Acceleration techniques
+	Occlusin culling
+	Back face culling using Geometry Shader
+Other techniques
+	Make a small game
+	Mouse Picking
+		(+ more)
+
+C:\Users\Simonekis\Desktop\clone
