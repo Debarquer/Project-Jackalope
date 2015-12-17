@@ -1,11 +1,9 @@
+#include <Windows.h>
 
-void SillyDill()
-{
-	return;
-}
+#include "Project Jackalope\WarmMilk.h"
 
-int main()
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	SillyDill();
+	WarmMilk hotMilk;
 	return 0;
 }
