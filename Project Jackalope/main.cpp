@@ -1,4 +1,4 @@
-#include <Windows.h>
+#include "Project Jackalope\Functions.h"
 #include <windowsx.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
@@ -8,11 +8,6 @@
 
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
-
-// prototypes for now
-void InitD3D(HWND hWnd);  
-void RenderFrame(void);     
-void CleanD3D(void);        
 
 IDXGISwapChain *swapchain;  
 ID3D11Device *dev;                     
