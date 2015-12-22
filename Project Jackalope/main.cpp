@@ -17,7 +17,9 @@ ID3D11Texture2D *pBackBuffer;
 ID3D11InputLayout *pLayout;            
 ID3D11VertexShader *pVS;              
 ID3D11PixelShader *pPS;                
-ID3D11Buffer *pVBuffer;   
+ID3D11Buffer *pVBuffer;
+ID3D11DepthStencilView* depthStencilView;
+ID3D11Texture2D* depthStencilBuffer;
 
 struct TRIANGLE { float x, y, z; float r, g, b, w; };
 
@@ -125,12 +127,30 @@ void InitD3D(HWND hWnd)
 		NULL,
 		&devcon);
 
+	//Describe Depth/Stencil Buffer and create 
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+
+	depthStencilDesc.Width = SCREEN_WIDTH;
+	depthStencilDesc.Height = SCREEN_HEIGHT;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+
+	dev->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilBuffer);
+	dev->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
 
 	swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 
 	dev->CreateRenderTargetView(pBackBuffer, NULL, &backbuffer);
 
 	devcon->OMSetRenderTargets(1, &backbuffer, NULL);
+	devcon->OMSetRenderTargets(1, &backbuffer, depthStencilView);
 
 	// Set the viewport
 	D3D11_VIEWPORT viewport;
@@ -138,6 +158,8 @@ void InitD3D(HWND hWnd)
 
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
 	viewport.Width = SCREEN_WIDTH;
 	viewport.Height = SCREEN_HEIGHT;
 
@@ -152,6 +174,7 @@ void RenderFrame(void)
 {
 	float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	devcon->ClearRenderTargetView(backbuffer, clearColor);
+	devcon->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// select which vertex buffer to display
 	UINT stride = sizeof(TRIANGLE);
@@ -177,6 +200,8 @@ void CleanD3D(void)
 	dev->Release();
 	devcon->Release();
 	pBackBuffer->Release();
+	depthStencilView->Release();
+	depthStencilBuffer->Release();
 }
 
 // Create shapes to render
