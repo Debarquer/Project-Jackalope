@@ -4,12 +4,18 @@ struct VOut
     float4 color : COLOR;
 };
 
+cbuffer VS_CONSTANT_BUFFER : register(b0)
+{
+    matrix worldViewProj;
+	matrix world;
+};
+
 // *** Vertex shader ***
 VOut VShader(float4 position : POSITION, float4 color : COLOR)
 {
     VOut output;
 
-    output.position = position;
+    output.position = mul(worldViewProj, position);
     output.color = color;
 
     return output;

@@ -1,15 +1,17 @@
 #include "Project Jackalope\Functions.h"
 #include <windowsx.h>
+#include <DirectXMath.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
+using namespace DirectX;
+
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
-//whaat is this i dont know anything lol i am a bad boy
 IDXGISwapChain *swapchain;  
 ID3D11Device *dev;                     
 ID3D11DeviceContext *devcon;           
@@ -19,8 +21,11 @@ ID3D11InputLayout *pLayout;
 ID3D11VertexShader *pVS;              
 ID3D11PixelShader *pPS;                
 ID3D11Buffer *pVBuffer;
+ID3D11Buffer* gConstantBuffer;
 ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer;
+
+float angle = 0.0f;
 
 struct TRIANGLE { float x, y, z; float r, g, b, w; };
 
@@ -74,8 +79,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			if (msg.message == WM_QUIT)
 				break;
 		}
-	
-		RenderFrame();
+
+		else
+		{
+			CreateConstantBuffer();
+			RenderFrame();
+		}	
 	}
 
 	CleanD3D();
@@ -96,6 +105,41 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+void CreateConstantBuffer()
+{
+	XMMATRIX world = XMMatrixRotationY(angle);
+	XMMATRIX view = XMMatrixLookAtLH(XMVECTOR{ 0, 0, -2 }, XMVECTOR{ 0, 0, 0 }, XMVECTOR{ 0, 1, 0 });
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(3.14 * 0.45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 20.0);
+	XMMATRIX worldViewProj = world * view * proj;
+
+	struct VS_CONSTANT_BUFFER
+	{
+		XMMATRIX worldViewProj;
+		XMMATRIX world;
+	};
+
+	VS_CONSTANT_BUFFER VsConstData;
+	VsConstData.worldViewProj = worldViewProj;
+	VsConstData.world = world;
+
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER);
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA InitData;
+	InitData.pSysMem = &VsConstData;
+	InitData.SysMemPitch = 0;
+	InitData.SysMemSlicePitch = 0;
+	dev->CreateBuffer(&cbDesc, &InitData, &gConstantBuffer);
+
+	angle = angle + 0.001f;
+	devcon->UpdateSubresource(gConstantBuffer, 0, 0, &VsConstData, 0, 0);
 }
 
 void InitD3D(HWND hWnd)
@@ -176,6 +220,7 @@ void RenderFrame(void)
 	float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
 	devcon->ClearRenderTargetView(backbuffer, clearColor);
 	devcon->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffer);
 
 	// select which vertex buffer to display
 	UINT stride = sizeof(TRIANGLE);
@@ -201,6 +246,7 @@ void CleanD3D(void)
 	dev->Release();
 	devcon->Release();
 	pBackBuffer->Release();
+	gConstantBuffer->Release();
 	depthStencilView->Release();
 	depthStencilBuffer->Release();
 }
