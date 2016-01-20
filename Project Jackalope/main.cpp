@@ -9,6 +9,7 @@
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
+//whaat is this i dont know anything lol i am a bad boy
 IDXGISwapChain *swapchain;  
 ID3D11Device *dev;                     
 ID3D11DeviceContext *devcon;           
