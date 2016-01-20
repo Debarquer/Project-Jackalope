@@ -3,14 +3,26 @@
 #include <DirectXMath.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
+#include "Project Jackalope\SimpleMath.h"
+
+#include <time.h>
+
+#include "Project Jackalope\Player.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 
+Player player;
+double dt;
+
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
+
+//movement booleans
+bool upIsPressed = false, downIsPressed = false, leftIsPressed = false, rightIsPressed = false, spaceIsPressed = false;
+DirectX::SimpleMath::Vector3 movement = DirectX::SimpleMath::Vector3(0, 0, 0);
 
 IDXGISwapChain *swapchain;  
 ID3D11Device *dev;                     
@@ -82,8 +94,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		else
 		{
+			clock_t prevTime = clock();
+
+
+			if(upIsPressed)
+				movement += DirectX::SimpleMath::Vector3(0, 0, 1);
+			if (downIsPressed)
+				movement += DirectX::SimpleMath::Vector3(0, 0, -1);
+			if (rightIsPressed)
+				movement += DirectX::SimpleMath::Vector3(1, 0, 0);
+			if (leftIsPressed)
+				movement += DirectX::SimpleMath::Vector3(-1, 0, 0);
+			if (spaceIsPressed)
+				movement += DirectX::SimpleMath::Vector3(0, 1, 0);
+
+			player.move(movement, dt);
+			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
+			player.update(dt);
 			CreateConstantBuffer();
 			RenderFrame();
+
+			clock_t diffTime = clock() - prevTime;
+			dt = (float)(diffTime) / CLOCKS_PER_SEC;
+			prevTime = clock();
 		}	
 	}
 
@@ -101,7 +134,51 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		
 		PostQuitMessage(0);
 		return 0;
-	} break;
+	}
+	case WM_KEYDOWN:
+	{
+		switch (wParam)
+		{
+		case VK_UP:
+			upIsPressed = true;
+			break;
+		case VK_DOWN:
+			downIsPressed = true;
+			break;
+		case VK_RIGHT:
+			rightIsPressed = true;
+			break;
+		case VK_LEFT:
+			leftIsPressed = true;
+			break;
+		case VK_SPACE:
+			spaceIsPressed = true;
+			break;
+		}
+		break;
+	}
+	case WM_KEYUP:
+	{
+		switch (wParam)
+		{
+		case VK_UP:
+			upIsPressed = false;
+			break;
+		case VK_DOWN:
+			downIsPressed = false;
+			break;
+		case VK_RIGHT:
+			rightIsPressed = false;
+			break;
+		case VK_LEFT:
+			leftIsPressed = false;
+			break;
+		case VK_SPACE:
+			spaceIsPressed = false;
+			break;
+		}
+		break;
+	}
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
@@ -110,7 +187,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 void CreateConstantBuffer()
 {
 	XMMATRIX world = XMMatrixRotationY(angle);
-	XMMATRIX view = XMMatrixLookAtLH(XMVECTOR{ 0, 0, -2 }, XMVECTOR{ 0, 0, 0 }, XMVECTOR{ 0, 1, 0 });
+	XMMATRIX view = XMMatrixLookAtLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(3.14 * 0.45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 20.0);
 	XMMATRIX worldViewProj = world * view * proj;
 
@@ -138,7 +215,7 @@ void CreateConstantBuffer()
 	InitData.SysMemSlicePitch = 0;
 	dev->CreateBuffer(&cbDesc, &InitData, &gConstantBuffer);
 
-	angle = angle + 0.001f;
+	angle += + 1 * dt;
 	devcon->UpdateSubresource(gConstantBuffer, 0, 0, &VsConstData, 0, 0);
 }
 
