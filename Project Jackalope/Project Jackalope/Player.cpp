@@ -49,7 +49,7 @@ void Player::update(double dt)
 		isAirborne = true;
 		currentSpeed.y -= dt*9.81;
 	}
-	else if(camera.y < dt*9.81)
+	else if(camera.y <= 0)
 	{
 		isAirborne = false;
 		currentSpeed.y = 0;
