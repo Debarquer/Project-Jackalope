@@ -1,7 +1,12 @@
 Core
 	Deferred rendering (KJS)
+<<<<<<< HEAD
 Gemoetrier
 	Parsing and and rendering an exising model format (S)
+=======
+Gheometry
+	Parsing rendering an exising model format (S)
+>>>>>>> 7e4e9d2a83c3c87935a255ed33bb39691c31a994
 	Height-map (K)
 Texture and lighting
 	Normal mapping (J)
