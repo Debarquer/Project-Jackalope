@@ -1,12 +1,10 @@
 #include "Player.h"
 
-
-
 Player::Player()
 {
 	movementSpeed = DirectX::SimpleMath::Vector3( 3, 5000, 3 );
 	currentSpeed = DirectX::SimpleMath::Vector3( 0, 0, 0 );
-	maxSpeed = DirectX::SimpleMath::Vector3( 1, 10, 1 );
+	maxSpeed = DirectX::SimpleMath::Vector3( 1, 10000, 1 );
 
 	camera = DirectX::SimpleMath::Vector3( 0, 0, -2 );
 	lookAt = DirectX::SimpleMath::Vector3( 0, 0, 0 );
@@ -15,7 +13,6 @@ Player::Player()
 	movedZ = false;
 	isAirborne = false;
 }
-
 
 Player::~Player()
 {
@@ -52,7 +49,7 @@ void Player::update(double dt)
 		isAirborne = true;
 		currentSpeed.y -= dt*9.81;
 	}
-	else if(camera.y < 0)
+	else if(camera.y < dt*9.81)
 	{
 		isAirborne = false;
 		currentSpeed.y = 0;

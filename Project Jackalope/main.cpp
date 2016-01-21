@@ -141,15 +141,19 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		switch (wParam)
 		{
 		case VK_UP:
+		case 0x57:
 			upIsPressed = true;
 			break;
 		case VK_DOWN:
+		case 0x53:
 			downIsPressed = true;
 			break;
 		case VK_RIGHT:
+		case 0x44:
 			rightIsPressed = true;
 			break;
 		case VK_LEFT:
+		case 0x41:
 			leftIsPressed = true;
 			break;
 		case VK_SPACE:
@@ -163,15 +167,19 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		switch (wParam)
 		{
 		case VK_UP:
+		case 0x57:
 			upIsPressed = false;
 			break;
 		case VK_DOWN:
+		case 0x53:	
 			downIsPressed = false;
 			break;
 		case VK_RIGHT:
+		case 0x44:
 			rightIsPressed = false;
 			break;
 		case VK_LEFT:
+		case 0x41:
 			leftIsPressed = false;
 			break;
 		case VK_SPACE:

@@ -5,5 +5,9 @@ private:
 public:
 	ModelLoader();
 	~ModelLoader();
+
+	bool LoadTextFile();
+	bool LoadBinaryFile();
+	bool ConvertTextToBinary();
 };
 
