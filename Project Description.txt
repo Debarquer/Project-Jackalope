@@ -1,20 +1,18 @@
 Core
-	Deferred rendering
+	Deferred rendering (KJS)
 Geometry
-	Parsing and rendering an exising model format
-	?
+	Parsing and rendering an exising model format (S)
+	Height-map (K)
 Texture and lighting
-	Normal mapping
+	Normal mapping (J)
 		(occlusion)
 Projection techniques
-	Shadow volumes
+	Shadow mapping/volumes (K)
 		(Shadow mapping, dynamic x mapping)
 Acceleration techniques
-	Occlusin culling
-	Back face culling using Geometry Shader
+	Occlusion culling (J)
+	Back face culling using Geometry Shader (S)
 Other techniques
-	Make a small game
-	Mouse Picking
+	Make a small game (S) - (Mouse Picking (S))
+	Water effect (K)
 		(+ more)
-
-C:\Users\Simonekis\Desktop\clone

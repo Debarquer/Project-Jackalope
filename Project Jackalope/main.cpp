@@ -8,6 +8,8 @@
 #include <time.h>
 
 #include "Project Jackalope\Player.h"
+#include "Project Jackalope\Model.h"
+#include "Project Jackalope\ModelLoader.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -95,7 +97,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		else
 		{
 			clock_t prevTime = clock();
-
 
 			if(upIsPressed)
 				movement += DirectX::SimpleMath::Vector3(0, 0, 1);
@@ -186,7 +187,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 void CreateConstantBuffer()
 {
-	XMMATRIX world = XMMatrixRotationY(angle);
+	XMMATRIX world = XMMatrixRotationY(0);
 	XMMATRIX view = XMMatrixLookAtLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(3.14 * 0.45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 20.0);
 	XMMATRIX worldViewProj = world * view * proj;
