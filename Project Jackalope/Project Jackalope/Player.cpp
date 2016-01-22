@@ -2,9 +2,9 @@
 
 Player::Player()
 {
-	movementSpeed = DirectX::SimpleMath::Vector3( 3, 5000, 3 );
+	movementSpeed = DirectX::SimpleMath::Vector3( 3, 5, 3 );
 	currentSpeed = DirectX::SimpleMath::Vector3( 0, 0, 0 );
-	maxSpeed = DirectX::SimpleMath::Vector3( 1, 10000, 1 );
+	maxSpeed = DirectX::SimpleMath::Vector3( 1, 1500, 1 );
 
 	camera = DirectX::SimpleMath::Vector3( 0, 0, -2 );
 	lookAt = DirectX::SimpleMath::Vector3( 0, 0, 0 );
@@ -20,8 +20,7 @@ Player::~Player()
 
 void Player::move(DirectX::SimpleMath::Vector3 movement, double dt)
 {
-	if (isAirborne)
-		movement.y = 0;
+	movement.y = 0;
 	//movementSpeed.y = 1 / dt;
 
 	currentSpeed += dt*movementSpeed*movement;
@@ -68,4 +67,12 @@ void Player::update(double dt)
 
 	movedX = false;
 	movedZ = false;
+}
+
+void Player::jump(double dt)
+{
+	if (isAirborne)
+		return;
+
+	currentSpeed.y = movementSpeed.y;
 }

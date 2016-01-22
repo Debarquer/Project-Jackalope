@@ -23,7 +23,7 @@ double dt;
 #define SCREEN_HEIGHT 600
 
 //movement booleans
-bool upIsPressed = false, downIsPressed = false, leftIsPressed = false, rightIsPressed = false, spaceIsPressed = false;
+bool upIsPressed = false, downIsPressed = false, leftIsPressed = false, rightIsPressed = false;
 DirectX::SimpleMath::Vector3 movement = DirectX::SimpleMath::Vector3(0, 0, 0);
 
 IDXGISwapChain *swapchain;  
@@ -106,8 +106,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				movement += DirectX::SimpleMath::Vector3(1, 0, 0);
 			if (leftIsPressed)
 				movement += DirectX::SimpleMath::Vector3(-1, 0, 0);
-			if (spaceIsPressed)
-				movement += DirectX::SimpleMath::Vector3(0, 1, 0);
 
 			player.move(movement, dt);
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
@@ -157,7 +155,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 			leftIsPressed = true;
 			break;
 		case VK_SPACE:
-			spaceIsPressed = true;
+			player.jump(dt);
 			break;
 		}
 		break;
@@ -181,9 +179,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		case VK_LEFT:
 		case 0x41:
 			leftIsPressed = false;
-			break;
-		case VK_SPACE:
-			spaceIsPressed = false;
 			break;
 		}
 		break;

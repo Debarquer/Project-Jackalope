@@ -19,6 +19,8 @@ public:
 	void move(DirectX::SimpleMath::Vector3 movement, double dt);
 	void update(double dt);
 
+	void jump(double dt);
+
 	Player();
 	~Player();
 };
