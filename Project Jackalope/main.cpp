@@ -40,10 +40,10 @@ ID3D11Buffer *pVBuffer;
 ID3D11Buffer* gConstantBuffer;
 ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer;
+ID3D11ShaderResourceView* CubesTexture;
+ID3D11SamplerState* CubesTexSamplerState;
 
 float angle = 0.0f;
-
-struct TRIANGLE { float x, y, z; float r, g, b, w; };
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -343,19 +343,12 @@ void CleanD3D(void)
 // Create shapes to render
 void InitGraphics()
 {
-	TRIANGLE OurVertices[] =
-	{
-		{ 0.0f, 0.5f, 0.0f,		1.0f, 0.0f, 0.0f, 1.0f },
-		{ 0.45f, -0.5, 0.0f,	0.0f, 1.0f, 0.0f, 1.0f },
-		{ -0.45f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f }
-	};
-
 	// create the vertex buffer
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 
 	bd.Usage = D3D11_USAGE_DYNAMIC;                
-	bd.ByteWidth = sizeof(Vertex)*model.mVertices.size();//sizeof(TRIANGLE) * 3; OLD             
+	bd.ByteWidth = sizeof(Vertex)*model.mVertices.size();           
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;   
 
@@ -364,7 +357,7 @@ void InitGraphics()
 	// copy the vertices into the buffer
 	D3D11_MAPPED_SUBRESOURCE ms;
 	devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    
-	memcpy(ms.pData, model.mVertices.data(), sizeof(Vertex)*model.mVertices.size());    //old         
+	memcpy(ms.pData, model.mVertices.data(), sizeof(Vertex)*model.mVertices.size());      
 	devcon->Unmap(pVBuffer, NULL);                                    
 }
 
@@ -374,6 +367,7 @@ void InitPipeline()
 	ID3D10Blob *VS, *PS;
 	D3DCompileFromFile(L"Effects.fx", 0, 0, "VShader", "vs_4_0", 0, 0, &VS, 0);
 	D3DCompileFromFile(L"Effects.fx", 0, 0, "PShader", "ps_4_0", 0, 0, &PS, 0);
+	
 
 	dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
 	dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
