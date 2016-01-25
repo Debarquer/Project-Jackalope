@@ -8,7 +8,8 @@
 
 struct Vertex
 {
-	float x, y, z, r, g, b, w;
+	float pX, pY, pZ, r, g, b, w;
+	float nX, nY, nZ, u, v;
 };
 
 class Model

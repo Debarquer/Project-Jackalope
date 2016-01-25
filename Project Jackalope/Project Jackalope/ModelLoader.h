@@ -11,8 +11,8 @@ namespace ModelLoader
 
 		std::vector<Vertex> model;
 
-		std::vector<unsigned int> vertexIndices;
-		std::vector<DirectX::SimpleMath::Vector3> tempVertices;
+		std::vector<unsigned int> vertexIndices, normalIndices, uvIndices;
+		std::vector<DirectX::SimpleMath::Vector3> tempVertices, tempNormals, tempUvs;
 
 		FILE* file = fopen(filename.c_str(), "r");
 		if (file == NULL)
@@ -34,11 +34,23 @@ namespace ModelLoader
 				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 				tempVertices.push_back(vertex);
 			}
+			if (strcmp(lineHeader, "vn") == 0)
+			{
+				DirectX::SimpleMath::Vector3 normal;
+				fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
+				tempNormals.push_back(normal);
+			}
+			if (strcmp(lineHeader, "vt") == 0)
+			{
+				DirectX::SimpleMath::Vector3 uv;
+				fscanf(file, "%f %f %f\n", &uv.x, &uv.y);
+				tempUvs.push_back(uv);
+			}
 			else if (strcmp(lineHeader, "f") == 0)
 			{
 				std::string vertex1, vertex2, vertex3;
-				unsigned int vertexIndex[3], normalIndex[3];
-				int matches = fscanf(file, "%d//%d %d//%d %d//%d\n", &vertexIndex[0], &normalIndex[0], &vertexIndex[1], &normalIndex[1], &vertexIndex[2], &normalIndex[2]);
+				unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
+				int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
 				if (matches != 9)
 				{
 					failed = true;
@@ -47,6 +59,12 @@ namespace ModelLoader
 				vertexIndices.push_back(vertexIndex[0]);
 				vertexIndices.push_back(vertexIndex[1]);
 				vertexIndices.push_back(vertexIndex[2]);
+				uvIndices.push_back(uvIndex[0]);
+				uvIndices.push_back(uvIndex[1]);
+				uvIndices.push_back(uvIndex[2]);
+				normalIndices.push_back(normalIndex[0]);
+				normalIndices.push_back(normalIndex[1]);
+				normalIndices.push_back(normalIndex[2]);
 			}
 		}
 
@@ -55,14 +73,23 @@ namespace ModelLoader
 			Vertex vertex;
 
 			unsigned int vertexIndex = vertexIndices[i];
-			vertex.x = tempVertices[vertexIndex - 1].x;
-			vertex.y = tempVertices[vertexIndex - 1].y;
-			vertex.z = tempVertices[vertexIndex - 1].z;
+			vertex.pX = tempVertices[vertexIndex - 1].x;
+			vertex.pY = tempVertices[vertexIndex - 1].y;
+			vertex.pZ = tempVertices[vertexIndex - 1].z;
 
 			vertex.r = 1;
 			vertex.g = 0;
 			vertex.b = 0;
 			vertex.w = 1;
+			
+			unsigned int normalIndex = normalIndices[i];
+			vertex.nX = tempNormals[normalIndex - 1].x;
+			vertex.nY = tempNormals[normalIndex - 1].y;
+			vertex.nZ = tempNormals[normalIndex - 1].z;
+
+			unsigned int uvIndex = uvIndices[i];
+			vertex.u = tempUvs[uvIndex - 1].x;
+			vertex.v = tempUvs[uvIndex - 1].y;
 
 			model.push_back(vertex);
 		}
