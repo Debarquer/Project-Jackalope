@@ -240,7 +240,7 @@ _Pvt_Extensions
 *.slo
 *.lo
 *.o
-*.obj
+* 
 
 # Precompiled Headers
 *.gch
