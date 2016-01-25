@@ -48,5 +48,8 @@
     <Text Include="Text.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="untitled.obj">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
