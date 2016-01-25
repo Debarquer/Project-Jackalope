@@ -17,6 +17,7 @@
 using namespace DirectX;
 
 Model model;
+
 Player player;
 double dt;
 
@@ -79,10 +80,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		NULL); 
 
 	ShowWindow(hWnd, nCmdShow);
-	
-	bool failed = false;
-	model.LoadModel(ModelLoader::LoadTextFile("Text.txt", failed));
 
+	bool failed;
+	model.LoadModel(ModelLoader::LoadTextFile("Text.txt", failed));
 	InitD3D(hWnd);
 
 	MSG msg = { 0 };
@@ -308,12 +308,12 @@ void RenderFrame(void)
 	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffer);
 
 	// select which vertex buffer to display
-	UINT stride = sizeof(Vertex)*model.mVertices.size();
+	UINT stride = sizeof(Vertex);//old
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	devcon->Draw(model.mVertices.size(), 0);
+	devcon->Draw(model.mVertices.size(), 0);//old
 	swapchain->Present(0, 0);
 }
 
@@ -351,7 +351,7 @@ void InitGraphics()
 	ZeroMemory(&bd, sizeof(bd));
 
 	bd.Usage = D3D11_USAGE_DYNAMIC;                
-	bd.ByteWidth = sizeof(Vertex)*model.mVertices.size();
+	bd.ByteWidth = sizeof(Vertex)*model.mVertices.size();//sizeof(TRIANGLE) * 3; OLD             
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;   
 
@@ -360,7 +360,7 @@ void InitGraphics()
 	// copy the vertices into the buffer
 	D3D11_MAPPED_SUBRESOURCE ms;
 	devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    
-	memcpy(ms.pData, model.mVertices.data(), sizeof(Vertex)*model.mVertices.size());
+	memcpy(ms.pData, model.mVertices.data(), sizeof(Vertex)*model.mVertices.size());    //old         
 	devcon->Unmap(pVBuffer, NULL);                                    
 }
 

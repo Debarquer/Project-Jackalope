@@ -43,7 +43,7 @@ namespace ModelLoader
 				{
 					failed = true;
 				}
-				
+
 				vertexIndices.push_back(vertexIndex[0]);
 				vertexIndices.push_back(vertexIndex[1]);
 				vertexIndices.push_back(vertexIndex[2]);

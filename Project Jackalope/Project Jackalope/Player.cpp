@@ -57,13 +57,13 @@ void Player::update(double dt)
 	}
 		
 	if (currentSpeed.x > 0 && !movedX)
-		currentSpeed.x -= dt * 10;
+		currentSpeed.x -= dt * 8;
 	else if(currentSpeed.x < 0 && !movedX)
-		currentSpeed.x += dt * 10;
+		currentSpeed.x += dt * 8;
 	if (currentSpeed.z > 0 && !movedZ)
-		currentSpeed.z -= dt * 10;
+		currentSpeed.z -= dt * 8;
 	else if (currentSpeed.z < 0 && !movedZ)
-		currentSpeed.z += dt * 10;
+		currentSpeed.z += dt * 8;
 
 	movedX = false;
 	movedZ = false;
