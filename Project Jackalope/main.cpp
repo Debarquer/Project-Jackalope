@@ -82,7 +82,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hWnd, nCmdShow);
 
 	bool failed;
-	model.LoadModel(ModelLoader::LoadTextFile("cube.obj", failed));
+	model.LoadModel(ModelLoader::LoadTextFile("Text.txt", failed));
 	InitD3D(hWnd);
 
 	MSG msg = { 0 };
@@ -171,18 +171,22 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		case VK_UP:
 		case 0x57:
 			upIsPressed = false;
+			movement.z = 0;
 			break;
 		case VK_DOWN:
 		case 0x53:	
 			downIsPressed = false;
+			movement.z = 0;
 			break;
 		case VK_RIGHT:
 		case 0x44:
 			rightIsPressed = false;
+			movement.x = 0;
 			break;
 		case VK_LEFT:
 		case 0x41:
 			leftIsPressed = false;
+			movement.x = 0;
 			break;
 		}
 		break;
