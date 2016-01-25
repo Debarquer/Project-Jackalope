@@ -2,6 +2,7 @@
 
 #include <d3d11.h>
 #include <vector>
+#include <string>
 //#include "SimpleMath.h"
 
 //using namespace DirectX::SimpleMath;
@@ -17,11 +18,14 @@ class Model
 private:
 
 public:
+	Model(Model& other);
+
+	std::string material;
 	std::vector<Vertex> mVertices;
 
 	Model();
 	~Model();
 
-	void LoadModel(std::vector<Vertex> &vertices);
+	void LoadModel(Model& other);
 };
 

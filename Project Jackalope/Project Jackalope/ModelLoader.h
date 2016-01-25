@@ -5,11 +5,11 @@
 
 namespace ModelLoader
 {
-	std::vector<Vertex> LoadTextFile(std::string filename, bool &failed)
+	void LoadTextFile(std::string filename, bool &failed, Model& returnModel)
 	{
 		failed = false;
 
-		std::vector<Vertex> model;
+		Model model;
 
 		std::vector<unsigned int> vertexIndices, normalIndices, uvIndices;
 		std::vector<DirectX::SimpleMath::Vector3> tempVertices, tempNormals, tempUvs;
@@ -91,10 +91,10 @@ namespace ModelLoader
 			vertex.u = tempUvs[uvIndex - 1].x;
 			vertex.v = tempUvs[uvIndex - 1].y;
 
-			model.push_back(vertex);
+			model.mVertices.push_back(vertex);
 		}
 
 		fclose(file);
-		return model;
+		returnModel = model;
 	}
 };

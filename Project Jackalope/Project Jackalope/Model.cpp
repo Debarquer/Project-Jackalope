@@ -6,12 +6,18 @@ Model::Model()
 {
 }
 
+Model::Model(Model& other)
+{
+	this->material = other.material;
+	this->mVertices = other.mVertices;
+}
 
 Model::~Model()
 {
 }
 
-void Model::LoadModel(std::vector<Vertex> &vertices)
+void Model::LoadModel(Model& other)
 {
-	mVertices = vertices;
+	this->material = other.material;
+	this->mVertices = other.mVertices;
 }
