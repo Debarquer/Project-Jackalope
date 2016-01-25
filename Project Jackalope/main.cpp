@@ -82,7 +82,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hWnd, nCmdShow);
 
 	bool failed;
-	model.LoadModel(ModelLoader::LoadTextFile("cube.obj", failed));
+	model.LoadModel(ModelLoader::LoadTextFile("Text.txt", failed));
 	InitD3D(hWnd);
 
 	MSG msg = { 0 };
