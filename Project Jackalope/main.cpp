@@ -171,18 +171,22 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		case VK_UP:
 		case 0x57:
 			upIsPressed = false;
+			movement.z = 0;
 			break;
 		case VK_DOWN:
 		case 0x53:	
 			downIsPressed = false;
+			movement.z = 0;
 			break;
 		case VK_RIGHT:
 		case 0x44:
 			rightIsPressed = false;
+			movement.x = 0;
 			break;
 		case VK_LEFT:
 		case 0x41:
 			leftIsPressed = false;
+			movement.x = 0;
 			break;
 		}
 		break;
