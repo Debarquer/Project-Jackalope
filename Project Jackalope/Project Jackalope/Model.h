@@ -16,7 +16,7 @@ class Model
 private:
 
 public:
-	Vertex* mVertices;
+	std::vector<Vertex> mVertices;
 
 	Model();
 	~Model();

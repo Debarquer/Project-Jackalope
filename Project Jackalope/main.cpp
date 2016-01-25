@@ -308,12 +308,12 @@ void RenderFrame(void)
 	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffer);
 
 	// select which vertex buffer to display
-	UINT stride = sizeof(model.mVertices);
+	UINT stride = sizeof(Vertex)*model.mVertices.size();
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	devcon->Draw(sizeof(model.mVertices), 0);
+	devcon->Draw(model.mVertices.size(), 0);
 	swapchain->Present(0, 0);
 }
 
@@ -351,7 +351,7 @@ void InitGraphics()
 	ZeroMemory(&bd, sizeof(bd));
 
 	bd.Usage = D3D11_USAGE_DYNAMIC;                
-	bd.ByteWidth = sizeof(model.mVertices);             
+	bd.ByteWidth = sizeof(Vertex)*model.mVertices.size();
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;   
 
@@ -360,7 +360,7 @@ void InitGraphics()
 	// copy the vertices into the buffer
 	D3D11_MAPPED_SUBRESOURCE ms;
 	devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    
-	memcpy(ms.pData, model.mVertices, sizeof(model.mVertices));             
+	memcpy(ms.pData, model.mVertices.data(), sizeof(Vertex)*model.mVertices.size());
 	devcon->Unmap(pVBuffer, NULL);                                    
 }
 
