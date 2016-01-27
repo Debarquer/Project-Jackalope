@@ -20,6 +20,7 @@ private:
 public:
 	Model(Model& other);
 
+	std::string materialFile;
 	std::string material;
 	std::vector<Vertex> mVertices;
 

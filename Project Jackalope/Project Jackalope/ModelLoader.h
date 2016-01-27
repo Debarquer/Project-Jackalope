@@ -34,17 +34,29 @@ namespace ModelLoader
 				fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 				tempVertices.push_back(vertex);
 			}
-			if (strcmp(lineHeader, "vn") == 0)
+			else if (strcmp(lineHeader, "vn") == 0)
 			{
 				DirectX::SimpleMath::Vector3 normal;
 				fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
 				tempNormals.push_back(normal);
 			}
-			if (strcmp(lineHeader, "vt") == 0)
+			else if (strcmp(lineHeader, "vt") == 0)
 			{
 				DirectX::SimpleMath::Vector3 uv;
 				fscanf(file, "%f %f %f\n", &uv.x, &uv.y);
 				tempUvs.push_back(uv);
+			}
+			else if (strcmp(lineHeader, "mtllib") == 0)
+			{
+				char tmpFilePath[128];
+				fscanf(file, "%s", &tmpFilePath);
+				model.materialFile = tmpFilePath;
+			}
+			else if (strcmp(lineHeader, "usemtl") == 0)
+			{
+				char tmpFileName[128];
+				fscanf(file, "%s", &tmpFileName);
+				model.material = tmpFileName;
 			}
 			else if (strcmp(lineHeader, "f") == 0)
 			{
