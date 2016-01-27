@@ -114,6 +114,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			player.move(movement, dt);
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
 			player.update(dt);
+
+			POINT p;
+			GetCursorPos(&p);
+			if (p.y > SCREEN_HEIGHT - (SCREEN_HEIGHT / 10))
+			{
+				player.rotate(0, 1, dt);
+			}
+			else if (p.y < (SCREEN_HEIGHT / 10))
+			{
+				player.rotate(0, -1, dt);
+			}
+			if (p.x > SCREEN_WIDTH - (SCREEN_WIDTH / 10))
+			{
+				player.rotate(1, 0, dt);
+			}
+			else if (p.x < (SCREEN_WIDTH / 10))
+			{
+				player.rotate(-1, 0, dt);
+			}
+
+
 			CreateConstantBuffer();
 			RenderFrame();
 

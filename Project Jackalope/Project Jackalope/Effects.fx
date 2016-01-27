@@ -16,7 +16,7 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR)
     VOut output;
 
     output.position = mul(worldViewProj, position);
-    output.color = color;
+    output.color = float4(0.7254901960784314, 0.4784313725490196, 0.3411764705882353, 1.0);
 
     return output;
 }
