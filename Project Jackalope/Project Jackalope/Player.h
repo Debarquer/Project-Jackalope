@@ -6,7 +6,6 @@
 #include <windowsx.h>
 #include "SimpleMath.h"
 
-using namespace DirectX;
 class Player
 {
 private:
@@ -18,9 +17,6 @@ private:
 
 	float rotY = 0.0f;
 	float rotX = 0.0f;
-
-	float moveLeftRight = 0.0f;
-	float moveBackForward = 0.0f;
 
 public:
 
