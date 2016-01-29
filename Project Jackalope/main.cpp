@@ -91,7 +91,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	modelHandler.addModel(ModelLoader::LoadTextFile("untitled.obj", failed));
 
 	ModelLoader::HeightMapInfo hmInfo;
-	HeightMapLoad("heightmap.bmp", hmInfo);
+	ModelLoader::HeightMapLoad("heightmap.bmp", hmInfo);
+	modelHandler.addModel(hmInfo.heightMap);
+	CreateGrid(hmInfo);
 	InitD3D(hWnd);
 
 	MSG msg = { 0 };
