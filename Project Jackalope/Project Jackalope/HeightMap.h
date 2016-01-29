@@ -6,7 +6,12 @@ using namespace DirectX;
 
 int NumFaces = 0;
 int NumVerices = 0;
+<<<<<<< HEAD
  void MakeHeightMap(ModelLoader::HeightMapInfo &hminfo)
+=======
+
+void CreateGrid(ModelLoader::HeightMapInfo &hminfo)
+>>>>>>> 19b1fb443df1ddf3bba03a00a6ea3d0ffbe18e49
 {
 	int cols = hminfo.terrainWidth;
 	int rows = hminfo.terrainHeight;
