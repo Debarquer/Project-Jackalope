@@ -93,6 +93,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ModelLoader::HeightMapInfo hmInfo;
 	ModelLoader::HeightMapLoad("heightmap.bmp", hmInfo);
 	CreateGrid(hmInfo);
+	CreateModelFromHeightMap(hmInfo);
 	modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 	InitD3D(hWnd);
 
@@ -352,7 +353,7 @@ void RenderFrame(void)
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+		
 	devcon->Draw(modelHandler.getVertices().size(), 0);//old
 	swapchain->Present(0, 0);
 }

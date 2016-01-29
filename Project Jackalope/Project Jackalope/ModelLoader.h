@@ -9,6 +9,7 @@ using namespace DirectX;
 namespace ModelLoader
 {
 	struct HeightMapInfo {
+		std::vector<DWORD> indices;
 		int terrainWidth;
 		int terrainHeight;
 		DWORD numVertices = 0;
