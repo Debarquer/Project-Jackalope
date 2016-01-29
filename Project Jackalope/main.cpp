@@ -57,8 +57,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc = WindowProc;
+	wc.cbClsExtra = NULL;
+	wc.cbWndExtra = NULL;
 	wc.hInstance = hInstance;
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wc.lpszMenuName = NULL;
+	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	wc.lpszClassName = L"WindowClass1";
 
 	RegisterClassEx(&wc);
@@ -94,11 +100,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-
 			if (msg.message == WM_QUIT)
 				break;
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 
 		else
@@ -117,6 +123,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			player.move(movement, dt);
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
 			player.update(dt);
+
+			POINT p;
+			GetCursorPos(&p);
+			
+			if (p.y > SCREEN_HEIGHT - (SCREEN_HEIGHT / 10))
+			{
+				player.rotate(0, 1, dt);
+			}
+			else if (p.y < (SCREEN_HEIGHT / 10))
+			{
+				player.rotate(0, -1, dt);
+			}
+			if (p.x > SCREEN_WIDTH - (SCREEN_WIDTH / 10))
+			{
+				player.rotate(1, 0, dt);
+			}
+			else if (p.x < (SCREEN_WIDTH / 10))
+			{
+				player.rotate(-1, 0, dt);
+			}
+
+
 			CreateConstantBuffer();
 			RenderFrame();
 
@@ -136,13 +164,16 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	switch (message)
 	{
 	case WM_DESTROY:
-	{
-		
+	{	
 		PostQuitMessage(0);
 		return 0;
 	}
 	case WM_KEYDOWN:
 	{
+		if (wParam == VK_ESCAPE) {
+			DestroyWindow(hWnd);
+		}
+
 		switch (wParam)
 		{
 		case VK_UP:

@@ -9,6 +9,8 @@ Player::Player()
 	camera = DirectX::SimpleMath::Vector3( 0, 0, -2 );
 	lookAt = DirectX::SimpleMath::Vector3( 0, 0, 0 );
 
+	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });
+
 	movedX = false;
 	movedZ = false;
 	isAirborne = false;
@@ -21,7 +23,6 @@ Player::~Player()
 void Player::move(DirectX::SimpleMath::Vector3 movement, double dt)
 {
 	movement.y = 0;
-	//movementSpeed.y = 1 / dt;
 
 	currentSpeed += dt*movementSpeed*movement;
 
@@ -32,16 +33,20 @@ void Player::move(DirectX::SimpleMath::Vector3 movement, double dt)
 
 	if (currentSpeed.x > maxSpeed.x)
 		currentSpeed.x = maxSpeed.x;
-	//if (currentSpeed.y > maxSpeed.y)
-		//currentSpeed.y = maxSpeed.y;
 	if (currentSpeed.z > maxSpeed.z)
 		currentSpeed.z = maxSpeed.z;
 }
 
 void Player::update(double dt)
 {
-	camera += dt*currentSpeed;
-	lookAt += dt*currentSpeed;
+	DirectX::XMMATRIX RotateY = DirectX::XMMatrixRotationY(rotY);
+	DirectX::XMVECTOR camForward = DirectX::XMVector3TransformCoord(DirectX::XMVECTOR{ 0, 0, 1 }, RotateY);
+
+	camera += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);	
+	lookAt += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);
+
+	//camera += dt*currentSpeed;
+	//lookAt += dt*currentSpeed;
 
 	if (camera.y > 0)
 	{
@@ -53,20 +58,22 @@ void Player::update(double dt)
 		isAirborne = false;
 		currentSpeed.y = 0;
 		camera.y = 0;
-		lookAt.y = 0;
+		//lookAt.y = 0;
 	}
 		
 	if (currentSpeed.x > 0 && !movedX)
-		currentSpeed.x -= dt * 8;
-	else if(currentSpeed.x < 0 && !movedX)
-		currentSpeed.x += dt * 8;
+		currentSpeed.x = 0;
+	else if (currentSpeed.x < 0 && !movedX)
+		currentSpeed.x = 0;
 	if (currentSpeed.z > 0 && !movedZ)
-		currentSpeed.z -= dt * 8;
+		currentSpeed.z = 0;
 	else if (currentSpeed.z < 0 && !movedZ)
-		currentSpeed.z += dt * 8;
+		currentSpeed.z = 0;
 
 	movedX = false;
 	movedZ = false;
+
+	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });
 }
 
 void Player::jump(double dt)
@@ -75,4 +82,24 @@ void Player::jump(double dt)
 		return;
 
 	currentSpeed.y = movementSpeed.y;
+}
+
+void Player::rotate(float x, float y, double dt)
+{
+	rotY += y*dt;
+	if (rotY > 0.5)
+		rotY = 0.5;
+	if (rotY < -0.25)
+		rotY = -0.25;
+	rotX += x*dt;
+
+	DirectX::XMMATRIX rotationMatrixY = DirectX::XMMatrixRotationX(rotY);
+	DirectX::XMMATRIX rotationMatrixX = DirectX::XMMatrixRotationY(rotX);
+
+	DirectX::XMMATRIX rotationMatrix = rotationMatrixY*rotationMatrixX;
+
+	DirectX::XMVECTOR transformedReference = DirectX::XMVector3Transform(DirectX::XMVECTOR{ 0, 0, 1 }, rotationMatrix);
+
+	lookAt = DirectX::operator+(camera, transformedReference);
+	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });
 }
