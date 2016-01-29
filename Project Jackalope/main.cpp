@@ -1,6 +1,5 @@
 #include "Project Jackalope\Functions.h"
 #include <windowsx.h>
-#include <DirectXMath.h>
 #include <d3dcompiler.h>
 #include "Project Jackalope\SimpleMath.h"
 
@@ -91,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	bool failed;
 	modelHandler.addModel(ModelLoader::LoadTextFile("untitled.obj", failed));
 
-	HeightMapInfo hmInfo;
+	ModelLoader::HeightMapInfo hmInfo;
 	HeightMapLoad("heightmap.bmp", hmInfo);
 	InitD3D(hWnd);
 
