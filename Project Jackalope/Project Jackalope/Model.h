@@ -17,7 +17,7 @@ class Model
 private:
 
 public:
-	Model(Model& other);
+	//Model(Model& other);
 
 	std::string materialFile;
 	std::string material;

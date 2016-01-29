@@ -6,11 +6,11 @@ Model::Model()
 {
 }
 
-Model::Model(Model& other)
-{
-	this->material = other.material;
-	this->mVertices = other.mVertices;
-}
+//Model::Model(Model& other)
+//{
+//	this->material = other.material;
+//	this->mVertices = other.mVertices;
+//}
 
 Model::~Model()
 {
