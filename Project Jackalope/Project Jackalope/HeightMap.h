@@ -81,4 +81,19 @@ void CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 	model.material = "NULL";
 	model.materialFile = "NULL";
 	mModels.push_back(model);
+	hminfo.indices = indices;
+}
+
+void CreateModelFromHeightMap(ModelLoader::HeightMapInfo& hmInfo)
+{
+	const int size = hmInfo.indices.size();
+	ModelLoader::HeightMapInfo temp;
+	temp.heightMap = new DirectX::XMFLOAT3[size];
+	hmInfo.heightMap = new DirectX::XMFLOAT3[size];
+	temp = hmInfo;
+
+	for (int i = 0; i < hmInfo.indices.size(); i++)
+	{
+		hmInfo.heightMap[i] = temp.heightMap[temp.indices[i]];
+	}
 }

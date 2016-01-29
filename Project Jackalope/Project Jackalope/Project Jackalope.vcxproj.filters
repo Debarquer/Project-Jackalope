@@ -60,6 +60,9 @@
     <Text Include="untitled.obj">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="Stormtrooper.obj">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Image Include="heightmap.bmp">
