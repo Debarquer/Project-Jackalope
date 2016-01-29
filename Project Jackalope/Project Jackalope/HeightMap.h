@@ -14,18 +14,19 @@ void CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 	//Create the grid
 	NumVerices = rows * cols;
 	NumFaces = (rows - 1) * (cols - 1) * 2;
-	std::vector<Vertex> v(NumVerices);
-
-	for (DWORD i = 0; i < rows; ++i)
+	std::vector<Vertex> v;
+	Vertex vertex;
+	for (DWORD i = 0; i < rows; i++)
 	{
-		for (DWORD j = 0; j < cols; ++j)
+		for (DWORD j = 0; j < cols; j++)
 		{
-			v[i*cols + j].pX = hminfo.heightMap[i*cols + j].x;
-			v[i*cols + j].pY = hminfo.heightMap[i*cols + j].y;
-			v[i*cols + j].pZ = hminfo.heightMap[i*cols + j].z;
-			v[i*cols + j].nX = 0.0f;
-			v[i*cols + j].nY = 1.0f;
-			v[i*cols + j].nZ = 0.0f;
+			vertex.pX = hminfo.heightMap[i*cols + j].x;
+			vertex.pY = hminfo.heightMap[i*cols + j].y;
+			vertex.pZ = hminfo.heightMap[i*cols + j].z;
+			vertex.nX = 0.0f;
+			vertex.nY = 1.0f;
+			vertex.nZ = 0.0f;
+			v.push_back(vertex);
 			hminfo.numVertices++;
 		}
 		
@@ -41,32 +42,43 @@ void CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 		{
 			//Bottom left
 			indices[k] = i*cols + j;
-			v[i*cols + j].u = texUindex + 0.0f;
-			v[i*cols + j].v = texVundex + 1.0f;
+			vertex.u = texUindex + 0.0f;
+			vertex.v = texVundex + 1.0f;
+			v.push_back(vertex);
 			//Bottom right
 			indices[k + 1] = i*cols + j + 1;
-			v[i*cols + j + 1].u = texUindex + 1.0f;
-			v[i*cols + j + 1].v = texVundex + 1.0f;
+			vertex.u = texUindex + 1.0f;
+			vertex.v = texVundex + 1.0f;
+			v.push_back(vertex);
 			//Top left
 			indices[k + 2] = (i + 1)*cols + j;
-			v[(i + 1) * cols + j].u = texUindex + 0.0f;
-			v[(i + 1) * cols + j].u = texVundex + 0.0f;
+			vertex.u = texUindex + 0.0f;
+			vertex.u = texVundex + 0.0f;
+			v.push_back(vertex);
 			//Top left
 			indices[k + 3] = (i + 1)*cols + j;
-			v[(i + 1) * cols + j].u = texUindex + 0.0f;
-			v[(i + 1) * cols + j].v = texVundex + 0.0f;
+			vertex.u = texUindex + 0.0f;
+			vertex.v = texVundex + 0.0f;
+			v.push_back(vertex);
 			//Bottom right 
 			indices[k + 4] = i*cols + j + 1;
-			v[i*cols + j + 1].u = texUindex + 1.0f;
-			v[i*cols + j + 1].v = texVundex + 1.0f;
+			vertex.u = texUindex + 1.0f;
+			vertex.v = texVundex + 1.0f;
+			v.push_back(vertex);
 			//Top right
 			indices[k + 5] = (i + 1)*cols + j + 1;
-			v[(i + 1)*cols + j + 1].u = texUindex + 1.0f;
-			v[(i + 1)*cols + j + 1].v = texVundex + 0.0f;
+			vertex.u = texUindex + 1.0f;
+			vertex.v = texVundex + 0.0f;
+			v.push_back(vertex);
 			k += 6; //next quad
 			texUindex++;
 		}
-		texUindex = 0;
 		texVundex++;
 	}
+	std::vector<Model> mModels;
+	Model model;
+	model.mVertices = v;
+	model.material = "NULL";
+	model.materialFile = "NULL";
+	mModels.push_back(model);
 }
