@@ -39,12 +39,14 @@ void Player::move(DirectX::SimpleMath::Vector3 movement, double dt)
 
 void Player::update(double dt)
 {
-	DirectX::XMMATRIX RotateY = DirectX::XMMatrixRotationX(rotY);
-	DirectX::XMVECTOR camForward = DirectX::XMVector3TransformCoord(DirectX::XMVECTOR{ 0, 0 , 1 }, RotateY);
-	camera += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);
-	
-	camera += dt*currentSpeed;
-	lookAt += dt*currentSpeed;
+	DirectX::XMMATRIX RotateY = DirectX::XMMatrixRotationY(rotY);
+	DirectX::XMVECTOR camForward = DirectX::XMVector3TransformCoord(DirectX::XMVECTOR{ 0, 0, 1 }, RotateY);
+
+	camera += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);	
+	lookAt += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);
+
+	//camera += dt*currentSpeed;
+	//lookAt += dt*currentSpeed;
 	
 	if (camera.y > 0)
 	{
