@@ -9,10 +9,9 @@
 
 struct Vertex
 {
-	float pX, pY, pZ, r, g, b, w;
-	float nX, nY, nZ, u, v;
+		float pX, pY, pZ, r, g, b, w,
+				nX, nY, nZ, u, v;
 };
-
 class Model
 {
 private:
