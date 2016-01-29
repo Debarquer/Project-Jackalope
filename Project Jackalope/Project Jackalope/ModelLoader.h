@@ -11,6 +11,7 @@ namespace ModelLoader
 	struct HeightMapInfo {
 		int terrainWidth;
 		int terrainHeight;
+		DWORD numVertices;
 		XMFLOAT3 *heightMap;
 	};
 
@@ -176,4 +177,4 @@ namespace ModelLoader
 		bitmapImage = 0;
 		return true;
 	}
-};
+}

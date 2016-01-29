@@ -6,8 +6,7 @@ using namespace DirectX;
 
 int NumFaces = 0;
 int NumVerices = 0;
-
-void MakeHeightMap(ModelLoader::HeightMapInfo &hminfo)
+ void MakeHeightMap(ModelLoader::HeightMapInfo &hminfo)
 {
 	int cols = hminfo.terrainWidth;
 	int rows = hminfo.terrainHeight;
@@ -27,6 +26,7 @@ void MakeHeightMap(ModelLoader::HeightMapInfo &hminfo)
 			v[i*cols + j].nY = 1.0f;
 			v[i*cols + j].nZ = 0.0f;
 		}
+		hminfo.numVertices++;
 	}
 	// Creating index list
 	std::vector<DWORD> indices(NumFaces * 3);
@@ -67,4 +67,4 @@ void MakeHeightMap(ModelLoader::HeightMapInfo &hminfo)
 		texUindex = 0;
 		texVundex++;
 	}
-};
+}
