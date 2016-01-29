@@ -144,12 +144,14 @@
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelHandler.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Functions.h" />
     <ClInclude Include="HeightMap.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="ModelHandler.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>

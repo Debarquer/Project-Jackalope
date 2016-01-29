@@ -5,7 +5,7 @@
 
 namespace ModelLoader
 {
-	void LoadTextFile(std::string filename, bool &failed, Model& returnModel)
+	Model& LoadTextFile(std::string filename, bool &failed)
 	{
 		failed = false;
 
@@ -107,6 +107,6 @@ namespace ModelLoader
 		}
 
 		fclose(file);
-		returnModel = model;
+		return model;
 	}
 };

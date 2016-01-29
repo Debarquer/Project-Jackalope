@@ -10,13 +10,14 @@
 #include "Project Jackalope\Model.h"
 #include "Project Jackalope\ModelLoader.h"
 #include "Project Jackalope\HeightMap.h"
+#include "Project Jackalope\ModelHandler.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 
-Model model;
+ModelHandler modelHandler;
 
 Player player;
 double dt;
@@ -88,7 +89,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hWnd, nCmdShow);
 
 	bool failed;
-	ModelLoader::LoadTextFile("untitled.obj", failed, model);
+	modelHandler.addModel(ModelLoader::LoadTextFile("untitled.obj", failed));
+
 	HeightMapInfo hmInfo;
 	HeightMapLoad("heightmap.bmp", hmInfo);
 	InitD3D(hWnd);
