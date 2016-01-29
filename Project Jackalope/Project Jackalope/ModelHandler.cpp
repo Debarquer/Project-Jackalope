@@ -29,10 +29,10 @@ void ModelHandler::addModel(Model& model)
 		mAllVertices.push_back(model.mVertices[i]);
 }
 
-void ModelHandler::addModel(DirectX::XMFLOAT3* positions)
+void ModelHandler::addModel(DirectX::XMFLOAT3* positions, int numVertices)
 {
 	std::vector<Vertex> vertices;
-	for (int i = 0; i < sizeof(positions) / sizeof(DirectX::XMFLOAT3); i++)
+	for (int i = 0; i < numVertices; i++)
 	{
 		Vertex vertex;
 		vertex.pX = positions->x;
