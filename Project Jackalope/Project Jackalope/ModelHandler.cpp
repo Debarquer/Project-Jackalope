@@ -24,4 +24,7 @@ std::vector<Vertex>& ModelHandler::getVertices()
 void ModelHandler::addModel(Model& model)
 {
 	mModels.push_back(model);
+
+	for (int i = 0; i < model.mVertices.size(); i++)
+		mAllVertices.push_back(model.mVertices[i]);
 }

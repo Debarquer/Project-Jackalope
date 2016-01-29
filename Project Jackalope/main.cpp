@@ -89,9 +89,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hWnd, nCmdShow);
 
 	bool failed;
-	Model model;
-	model = ModelLoader::LoadTextFile("untitled.obj", failed);
-	//modelHandler.addModel(ModelLoader::LoadTextFile("untitled.obj", failed));
+	modelHandler.addModel(ModelLoader::LoadTextFile("untitled.obj", failed));
 
 	HeightMapInfo hmInfo;
 	HeightMapLoad("heightmap.bmp", hmInfo);

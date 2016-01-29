@@ -5,7 +5,7 @@
 
 namespace ModelLoader
 {
-	Model& LoadTextFile(std::string filename, bool &failed)
+	Model LoadTextFile(std::string filename, bool &failed)
 	{
 		failed = false;
 
