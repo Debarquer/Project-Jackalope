@@ -26,8 +26,9 @@ void CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 			v[i*cols + j].nX = 0.0f;
 			v[i*cols + j].nY = 1.0f;
 			v[i*cols + j].nZ = 0.0f;
+			hminfo.numVertices++;
 		}
-		hminfo.numVertices++;
+		
 	}
 	// Creating index list
 	std::vector<DWORD> indices(NumFaces * 3);
