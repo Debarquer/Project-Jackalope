@@ -47,7 +47,7 @@ void Player::update(double dt)
 
 	//camera += dt*currentSpeed;
 	//lookAt += dt*currentSpeed;
-	
+
 	if (camera.y > 0)
 	{
 		isAirborne = true;

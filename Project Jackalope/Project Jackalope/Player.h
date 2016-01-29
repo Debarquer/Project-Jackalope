@@ -15,7 +15,9 @@ private:
 	DirectX::SimpleMath::Vector3 currentSpeed;
 	DirectX::SimpleMath::Vector3 maxSpeed;
 
-	float rotY, rotX;
+	float rotY = 0.0f;
+	float rotX = 0.0f;
+
 public:
 
 	DirectX::SimpleMath::Vector3 camera;
