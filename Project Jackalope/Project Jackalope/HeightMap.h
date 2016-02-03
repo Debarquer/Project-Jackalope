@@ -7,6 +7,17 @@ using namespace DirectX;
 int NumFaces = 0;
 int NumVerices = 0;
 
+DirectX::SimpleMath::Vector3 cross(DirectX::SimpleMath::Vector3 v1, DirectX::SimpleMath::Vector3 v2)
+{
+	DirectX::SimpleMath::Vector3 output;
+
+	output.x = v1.y * v2.z - v1.z * v2.y;
+	output.y = v1.z * v2.x - v1.x * v2.z;
+	output.z = v1.x * v2.y - v1.y * v2.x;
+
+	return output;
+}
+
 std::vector<Model::Vertex> CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 {
 	int cols = hminfo.terrainWidth;
@@ -99,6 +110,37 @@ std::vector<Model::Vertex> triangulateHeightMapData(std::vector<Model::Vertex> v
 			tmp[n + 2].pZ = vertices[y + hminfo.terrainWidth + i*hminfo.terrainWidth].pZ;
 			tmp[n + 2].pY = vertices[y + hminfo.terrainWidth + i*hminfo.terrainWidth].pY;
 
+			//Calculate the normals for the first triangle
+			DirectX::SimpleMath::Vector3 tmpNormal = cross(
+				DirectX::SimpleMath::Vector3{ tmp[n + 1].pX, tmp[n + 1].pY, tmp[n + 1].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n].pX, tmp[n].pY, tmp[n].pZ },
+				DirectX::SimpleMath::Vector3{ tmp[n + 2].pX, tmp[n + 2].pY, tmp[n + 2].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n].pX, tmp[n].pY, tmp[n].pZ });
+
+			tmp[n].nX = tmpNormal.x;
+			tmp[n].nY = tmpNormal.y;
+			tmp[n].nZ = tmpNormal.z;
+
+			tmpNormal = cross(
+				DirectX::SimpleMath::Vector3{ tmp[n].pX, tmp[n].pY, tmp[n].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 1].pX, tmp[n + 1].pY, tmp[n + 1].pZ },
+				DirectX::SimpleMath::Vector3{ tmp[n + 2].pX, tmp[n + 2].pY, tmp[n + 2].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 1].pX, tmp[n + 1].pY, tmp[n + 1].pZ });
+
+			tmp[n+1].nX = tmpNormal.x;
+			tmp[n+1].nY = tmpNormal.y;
+			tmp[n+1].nZ = tmpNormal.z;
+
+			tmpNormal = cross(
+				DirectX::SimpleMath::Vector3{ tmp[n].pX, tmp[n].pY, tmp[n].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 2].pX, tmp[n + 2].pY, tmp[n + 2].pZ },
+				DirectX::SimpleMath::Vector3{ tmp[n + 1].pX, tmp[n + 1].pY, tmp[n + 1].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 2].pX, tmp[n + 2].pY, tmp[n + 2].pZ });
+
+			tmp[n + 2].nX = tmpNormal.x;
+			tmp[n + 2].nY = tmpNormal.y;
+			tmp[n + 2].nZ = tmpNormal.z;
+
 			tmp[n + 3].pX = vertices[y + i*hminfo.terrainWidth].pX;
 			tmp[n + 3].pZ = vertices[y + i*hminfo.terrainWidth].pZ;
 			tmp[n + 3].pY = vertices[y + i*hminfo.terrainWidth].pY;
@@ -110,6 +152,37 @@ std::vector<Model::Vertex> triangulateHeightMapData(std::vector<Model::Vertex> v
 			tmp[n + 5].pX = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pX;
 			tmp[n + 5].pZ = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pZ;
 			tmp[n + 5].pY = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pY;
+
+			//Calculate the normals for the second triangle
+			tmpNormal = cross(
+				DirectX::SimpleMath::Vector3{ tmp[n + 4].pX, tmp[n + 4].pY, tmp[n + 4].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 3].pX, tmp[n + 3].pY, tmp[n + 3].pZ },
+				DirectX::SimpleMath::Vector3{ tmp[n + 5].pX, tmp[n + 5].pY, tmp[n + 5].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 3].pX, tmp[n + 3].pY, tmp[n + 3].pZ });
+
+			tmp[n + 3].nX = tmpNormal.x;
+			tmp[n + 3].nY = tmpNormal.y;
+			tmp[n + 3].nZ = tmpNormal.z;
+
+			tmpNormal = cross(
+				DirectX::SimpleMath::Vector3{ tmp[n + 3].pX, tmp[n + 3].pY, tmp[n + 3].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 4].pX, tmp[n + 4].pY, tmp[n + 4].pZ },
+				DirectX::SimpleMath::Vector3{ tmp[n + 5].pX, tmp[n + 5].pY, tmp[n + 5].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 4].pX, tmp[n + 4].pY, tmp[n + 4].pZ });
+
+			tmp[n + 4].nX = tmpNormal.x;
+			tmp[n + 4].nY = tmpNormal.y;
+			tmp[n + 4].nZ = tmpNormal.z;
+
+			tmpNormal = cross(
+				DirectX::SimpleMath::Vector3{ tmp[n + 3].pX, tmp[n + 3].pY, tmp[n + 3].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 5].pX, tmp[n + 5].pY, tmp[n + 5].pZ },
+				DirectX::SimpleMath::Vector3{ tmp[n + 4].pX, tmp[n + 4].pY, tmp[n + 4].pZ } -
+				DirectX::SimpleMath::Vector3{ tmp[n + 5].pX, tmp[n + 5].pY, tmp[n + 5].pZ });
+
+			tmp[n + 5].nX = tmpNormal.x;
+			tmp[n + 5].nY = tmpNormal.y;
+			tmp[n + 5].nZ = tmpNormal.z;
 		}
 	}
 

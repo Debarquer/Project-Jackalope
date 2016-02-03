@@ -28,7 +28,6 @@ public:
 	~Model();
 
 	void LoadModel(Model& other);
-
 	static Model LoadTextFile(std::string filename, bool &failed);
 };
 

@@ -27,6 +27,9 @@
     <ClCompile Include="ModelHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Functions.h">
@@ -45,6 +48,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ModelHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -66,9 +72,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="heightmap.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="LAND.BMP">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelHandler.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -150,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="Functions.h" />
     <ClInclude Include="HeightMap.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelHandler.h" />
     <ClInclude Include="ModelLoader.h" />
@@ -179,7 +181,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="heightmap.bmp" />
-    <Image Include="LAND.BMP" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Stormtrooper.obj">

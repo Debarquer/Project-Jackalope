@@ -10,6 +10,7 @@
 #include "Project Jackalope\ModelLoader.h"
 #include "Project Jackalope\HeightMap.h"
 #include "Project Jackalope\ModelHandler.h"
+#include "Project Jackalope\Light.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -17,6 +18,7 @@
 using namespace DirectX;
 
 ModelHandler modelHandler;
+Light light;
 
 Player player;
 double dt;
@@ -91,12 +93,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//modelHandler.addModel(ModelLoader::LoadTextFile("untitled.obj", failed));
 	//modelHandler.addModel(ModelLoader::LoadTextFile("Stormtrooper.obj", failed));
 
-	
 	ModelLoader::HeightMapInfo hmInfo;
 	ModelLoader::HeightMapLoad("heightmap.bmp", hmInfo);
 	modelHandler.addModel(triangulateHeightMapData(CreateGrid(hmInfo), hmInfo));
 	//CreateModelFromHeightMap(hmInfo);
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
+
+	light.r = 1;
+	light.g = 1;
+	light.b = 1;
+	light.position.x = 100;
+	light.position.z = 100;
+	light.position.y = 1000;
+
 	InitD3D(hWnd);
 
 	MSG msg = { 0 };
@@ -246,11 +255,15 @@ void CreateConstantBuffer()
 	{
 		XMMATRIX worldViewProj;
 		XMMATRIX world;
+		//XMFLOAT3 lightColor;
+		//XMFLOAT3 lightPosition;
 	};
 
 	VS_CONSTANT_BUFFER VsConstData;
 	VsConstData.worldViewProj = worldViewProj;
 	VsConstData.world = world;
+	//VsConstData.lightColor = XMFLOAT3{ light.r, light.g, light.b };
+	//VsConstData.lightPosition = light.position;
 
 	D3D11_BUFFER_DESC cbDesc;
 	cbDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER);
