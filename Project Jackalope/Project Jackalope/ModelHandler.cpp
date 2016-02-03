@@ -16,7 +16,7 @@ std::vector<Model>& ModelHandler::getModels()
 	return mModels;
 }
 
-std::vector<Vertex>& ModelHandler::getVertices()
+std::vector<Model::Vertex>& ModelHandler::getVertices()
 {
 	return mAllVertices;
 }
@@ -31,17 +31,17 @@ void ModelHandler::addModel(Model& model)
 
 void ModelHandler::addModel(DirectX::XMFLOAT3* positions, DWORD numVertices)
 {
-	std::vector<Vertex> vertices;
+	std::vector<Model::Vertex> vertices;
 	for (DWORD i = 0; i < numVertices; i++)
 	{
-		Vertex vertex;
+		Model::Vertex vertex;
 		vertex.pX = positions[i].x;
 		vertex.pY = positions[i].y;
 		vertex.pZ = positions[i].z;
 
 		vertex.u = 0;
 		vertex.v = 0;
-
+		
 		vertex.nX = 0;
 		vertex.nY = 1;
 		vertex.nZ = 0;

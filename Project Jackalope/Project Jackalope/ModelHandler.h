@@ -8,13 +8,13 @@ class ModelHandler
 {
 private:
 	std::vector<Model> mModels;
-	std::vector<Vertex> mAllVertices;
+	std::vector<Model::Vertex> mAllVertices;
 public:
 	ModelHandler();
 	~ModelHandler();
 
 	std::vector<Model>& getModels();
-	std::vector<Vertex>& getVertices();
+	std::vector<Model::Vertex>& getVertices();
 
 	void addModel(Model& model);
 	void addModel(DirectX::XMFLOAT3* positions, DWORD numVertices);

@@ -14,8 +14,8 @@ void CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 	//Create the grid
 	NumVerices = rows * cols;
 	NumFaces = (rows - 1) * (cols - 1) * 2;
-	std::vector<Vertex> v;
-	Vertex vertex;
+	std::vector<Model::Vertex> v;
+	Model::Vertex vertex;
 	for (DWORD i = 0; i < rows; i++)
 	{
 		for (DWORD j = 0; j < cols; j++)
