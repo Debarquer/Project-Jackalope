@@ -7,7 +7,7 @@ using namespace DirectX;
 int NumFaces = 0;
 int NumVerices = 0;
 
-void CreateGrid(ModelLoader::HeightMapInfo &hminfo)
+std::vector<Model::Vertex> CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 {
 	int cols = hminfo.terrainWidth;
 	int rows = hminfo.terrainHeight;
@@ -75,13 +75,7 @@ void CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 		}
 		texVundex++;
 	}
-	std::vector<Model> mModels;
-	Model model;
-	model.mVertices = v;
-	model.material = "NULL";
-	model.materialFile = "NULL";
-	mModels.push_back(model);
-	hminfo.indices = indices;
+	return v;
 }
 
 void CreateModelFromHeightMap(ModelLoader::HeightMapInfo& hmInfo)
