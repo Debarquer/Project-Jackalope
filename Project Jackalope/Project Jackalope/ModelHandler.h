@@ -17,6 +17,7 @@ public:
 	std::vector<Model::Vertex>& getVertices();
 
 	void addModel(Model& model);
+	void addModel(std::vector<Model::Vertex> vertices);
 	void addModel(DirectX::XMFLOAT3* positions, DWORD numVertices);
 };
 

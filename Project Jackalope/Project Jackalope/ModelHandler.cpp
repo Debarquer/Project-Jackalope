@@ -29,6 +29,16 @@ void ModelHandler::addModel(Model& model)
 		mAllVertices.push_back(model.mVertices[i]);
 }
 
+void ModelHandler::addModel(std::vector<Model::Vertex> vertices)
+{
+	Model model;
+	model.mVertices = vertices;
+	model.material = "NULL";
+	model.materialFile = "NULL";
+
+	mModels.push_back(model);
+}
+
 void ModelHandler::addModel(DirectX::XMFLOAT3* positions, DWORD numVertices)
 {
 	std::vector<Model::Vertex> vertices;
