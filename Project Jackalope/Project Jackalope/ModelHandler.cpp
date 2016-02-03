@@ -35,6 +35,9 @@ void ModelHandler::addModel(std::vector<Model::Vertex> vertices)
 	model.mVertices = vertices;
 	model.material = "NULL";
 	model.materialFile = "NULL";
+	
+	for (int i = 0; i < vertices.size(); i++)
+		mAllVertices.push_back(vertices[i]);
 
 	mModels.push_back(model);
 }

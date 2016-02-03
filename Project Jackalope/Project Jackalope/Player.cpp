@@ -6,7 +6,7 @@ Player::Player()
 	currentSpeed = DirectX::SimpleMath::Vector3( 0, 0, 0 );
 	maxSpeed = DirectX::SimpleMath::Vector3( 1, 1500, 1 );
 
-	camera = DirectX::SimpleMath::Vector3( 0, 0, -2 );
+	camera = DirectX::SimpleMath::Vector3( 0, 20, -2 );
 	lookAt = DirectX::SimpleMath::Vector3( 0, 0, 0 );
 
 	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });
@@ -87,10 +87,10 @@ void Player::jump(double dt)
 void Player::rotate(float x, float y, double dt)
 {
 	rotY += y*dt;
-	if (rotY > 0.5)
-		rotY = 0.5;
-	if (rotY < -0.25)
-		rotY = -0.25;
+	//if (rotY > 0.5)
+		//rotY = 0.5;
+	//if (rotY < -0.25)
+		//rotY = -0.25;
 	rotX += x*dt;
 
 	DirectX::XMMATRIX rotationMatrixY = DirectX::XMMatrixRotationX(rotY);

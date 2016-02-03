@@ -91,12 +91,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//modelHandler.addModel(ModelLoader::LoadTextFile("untitled.obj", failed));
 	//modelHandler.addModel(ModelLoader::LoadTextFile("Stormtrooper.obj", failed));
 
-
+	
 	ModelLoader::HeightMapInfo hmInfo;
 	ModelLoader::HeightMapLoad("heightmap.bmp", hmInfo);
-	CreateGrid(hmInfo);
+	modelHandler.addModel(triangulateHeightMapData(CreateGrid(hmInfo), hmInfo));
 	//CreateModelFromHeightMap(hmInfo);
-	modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
+	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 	InitD3D(hWnd);
 
 	MSG msg = { 0 };
@@ -338,6 +338,8 @@ void InitD3D(HWND hWnd)
 
 	devcon->RSSetViewports(1, &viewport);
 
+	//ShowCursor(false);
+
 	InitPipeline();
 	InitGraphics();
 }
@@ -351,12 +353,12 @@ void RenderFrame(void)
 	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffer);
 
 	// select which vertex buffer to display
-	UINT stride = sizeof(Model::Vertex);//old
+	UINT stride = sizeof(Model::Vertex);
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		
-	devcon->Draw(modelHandler.getVertices().size(), 0);//old
+	devcon->Draw(modelHandler.getVertices().size(), 0);
 	swapchain->Present(0, 0);
 }
 

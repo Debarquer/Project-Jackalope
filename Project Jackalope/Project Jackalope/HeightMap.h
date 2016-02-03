@@ -78,16 +78,37 @@ std::vector<Model::Vertex> CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 	return v;
 }
 
-void CreateModelFromHeightMap(ModelLoader::HeightMapInfo& hmInfo)
+std::vector<Model::Vertex> triangulateHeightMapData(std::vector<Model::Vertex> vertices, ModelLoader::HeightMapInfo &hminfo)
 {
-	const int size = hmInfo.indices.size();
-	ModelLoader::HeightMapInfo temp;
-	temp.heightMap = new DirectX::XMFLOAT3[size];
-	hmInfo.heightMap = new DirectX::XMFLOAT3[size];
-	temp = hmInfo;
+	std::vector<Model::Vertex> tmp;
+	tmp.resize(hminfo.terrainHeight*hminfo.terrainWidth);
 
-	for (int i = 0; i < hmInfo.indices.size(); i++)
+	for (int i = 0, y = 0; y < hminfo.terrainHeight; i += 6, y++)
 	{
-		hmInfo.heightMap[i] = temp.heightMap[temp.indices[i]];
+			tmp[i].pX = vertices[y].pX;
+			tmp[i].pZ = vertices[y].pZ;
+			tmp[i].pY = vertices[y].pY;
+
+			tmp[i + 1].pX = vertices[y + hminfo.terrainWidth + 1].pX;
+			tmp[i + 1].pZ = vertices[y + hminfo.terrainWidth + 1].pZ;
+			tmp[i + 1].pY = vertices[y + hminfo.terrainWidth + 1].pY;
+
+			tmp[i + 2].pX = vertices[y + hminfo.terrainWidth].pX;
+			tmp[i + 2].pZ = vertices[y + hminfo.terrainWidth].pZ;
+			tmp[i + 2].pY = vertices[y + hminfo.terrainWidth].pY;
+
+			tmp[i + 3].pX = vertices[y].pX;
+			tmp[i + 3].pZ = vertices[y].pZ;
+			tmp[i + 3].pY = vertices[y].pY;
+
+			tmp[i + 4].pX = vertices[y + 1].pX;
+			tmp[i + 4].pZ = vertices[y + 1].pZ;
+			tmp[i + 4].pY = vertices[y + 1].pY;
+
+			tmp[i + 5].pX = vertices[y + hminfo.terrainWidth + 1].pX;
+			tmp[i + 5].pZ = vertices[y + hminfo.terrainWidth + 1].pZ;
+			tmp[i + 5].pY = vertices[y + hminfo.terrainWidth + 1].pY;
 	}
+
+	return tmp;
 }
