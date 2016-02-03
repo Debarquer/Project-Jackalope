@@ -2,11 +2,11 @@
 
 Player::Player()
 {
-	movementSpeed = DirectX::SimpleMath::Vector3( 3, 5, 3 );
+	movementSpeed = DirectX::SimpleMath::Vector3( 300, 500, 300 );
 	currentSpeed = DirectX::SimpleMath::Vector3( 0, 0, 0 );
-	maxSpeed = DirectX::SimpleMath::Vector3( 1, 1500, 1 );
+	maxSpeed = DirectX::SimpleMath::Vector3( 100, 1500, 100 );
 
-	camera = DirectX::SimpleMath::Vector3( 0, 20, -2 );
+	camera = DirectX::SimpleMath::Vector3( 0, 100, -2 );
 	lookAt = DirectX::SimpleMath::Vector3( 0, 0, 0 );
 
 	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });

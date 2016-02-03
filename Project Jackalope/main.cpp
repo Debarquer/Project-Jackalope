@@ -239,7 +239,7 @@ void CreateConstantBuffer()
 {
 	XMMATRIX world = XMMatrixRotationY(0);
 	XMMATRIX view = XMMatrixLookAtLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(3.14 * 0.45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 20.0);
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(3.14 * 0.45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
 	XMMATRIX worldViewProj = world * view * proj;
 
 	struct VS_CONSTANT_BUFFER
@@ -347,7 +347,7 @@ void InitD3D(HWND hWnd)
 // Render single frame
 void RenderFrame(void)
 {
-	float clearColor[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	devcon->ClearRenderTargetView(backbuffer, clearColor);
 	devcon->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffer);

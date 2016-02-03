@@ -81,33 +81,36 @@ std::vector<Model::Vertex> CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 std::vector<Model::Vertex> triangulateHeightMapData(std::vector<Model::Vertex> vertices, ModelLoader::HeightMapInfo &hminfo)
 {
 	std::vector<Model::Vertex> tmp;
-	tmp.resize(hminfo.terrainHeight*hminfo.terrainWidth);
+	tmp.resize(hminfo.terrainHeight*hminfo.terrainWidth*6);
 
-	for (int i = 0, y = 0; y < hminfo.terrainHeight; i += 6, y++)
+	for (int i = 0, n = 0; i < hminfo.terrainHeight-1; i++)
 	{
-			tmp[i].pX = vertices[y].pX;
-			tmp[i].pZ = vertices[y].pZ;
-			tmp[i].pY = vertices[y].pY;
+		for (int y = 0; y < hminfo.terrainWidth; y++, n+=6)
+		{
+			tmp[n].pX = vertices[y + i*hminfo.terrainWidth].pX;
+			tmp[n].pZ = vertices[y + i*hminfo.terrainWidth].pZ;
+			tmp[n].pY = vertices[y + i*hminfo.terrainWidth].pY;
 
-			tmp[i + 1].pX = vertices[y + hminfo.terrainWidth + 1].pX;
-			tmp[i + 1].pZ = vertices[y + hminfo.terrainWidth + 1].pZ;
-			tmp[i + 1].pY = vertices[y + hminfo.terrainWidth + 1].pY;
+			tmp[n + 1].pX = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pX;
+			tmp[n + 1].pZ = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pZ;
+			tmp[n + 1].pY = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pY;
 
-			tmp[i + 2].pX = vertices[y + hminfo.terrainWidth].pX;
-			tmp[i + 2].pZ = vertices[y + hminfo.terrainWidth].pZ;
-			tmp[i + 2].pY = vertices[y + hminfo.terrainWidth].pY;
+			tmp[n + 2].pX = vertices[y + hminfo.terrainWidth + i*hminfo.terrainWidth].pX;
+			tmp[n + 2].pZ = vertices[y + hminfo.terrainWidth + i*hminfo.terrainWidth].pZ;
+			tmp[n + 2].pY = vertices[y + hminfo.terrainWidth + i*hminfo.terrainWidth].pY;
 
-			tmp[i + 3].pX = vertices[y].pX;
-			tmp[i + 3].pZ = vertices[y].pZ;
-			tmp[i + 3].pY = vertices[y].pY;
+			tmp[n + 3].pX = vertices[y + i*hminfo.terrainWidth].pX;
+			tmp[n + 3].pZ = vertices[y + i*hminfo.terrainWidth].pZ;
+			tmp[n + 3].pY = vertices[y + i*hminfo.terrainWidth].pY;
 
-			tmp[i + 4].pX = vertices[y + 1].pX;
-			tmp[i + 4].pZ = vertices[y + 1].pZ;
-			tmp[i + 4].pY = vertices[y + 1].pY;
+			tmp[n + 4].pX = vertices[y + 1 + i*hminfo.terrainWidth].pX;
+			tmp[n + 4].pZ = vertices[y + 1 + i*hminfo.terrainWidth].pZ;
+			tmp[n + 4].pY = vertices[y + 1 + i*hminfo.terrainWidth].pY;
 
-			tmp[i + 5].pX = vertices[y + hminfo.terrainWidth + 1].pX;
-			tmp[i + 5].pZ = vertices[y + hminfo.terrainWidth + 1].pZ;
-			tmp[i + 5].pY = vertices[y + hminfo.terrainWidth + 1].pY;
+			tmp[n + 5].pX = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pX;
+			tmp[n + 5].pZ = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pZ;
+			tmp[n + 5].pY = vertices[y + hminfo.terrainWidth + 1 + i*hminfo.terrainWidth].pY;
+		}
 	}
 
 	return tmp;
