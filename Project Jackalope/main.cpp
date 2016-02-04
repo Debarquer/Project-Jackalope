@@ -42,8 +42,8 @@ ID3D11Buffer *pVBuffer;
 ID3D11Buffer* gConstantBuffer;
 ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer;
-ID3D11ShaderResourceView* CubesTexture;
-ID3D11SamplerState* CubesTexSamplerState;
+ID3D11RasterizerState* rasterState;
+ID3D11DepthStencilState* depthStencilState;
 
 float angle = 0.0f;
 
@@ -315,7 +315,6 @@ void InitD3D(HWND hWnd)
 
 	//Creating depthstencil (though forced to name it depthbuffer) and rasterdesc
 	D3D11_DEPTH_STENCIL_DESC depthBufferDesc;
-	ID3D11DepthStencilState* depthStencilState;
 
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
@@ -356,7 +355,6 @@ void InitD3D(HWND hWnd)
 
 	//Rasterizer description
 	D3D11_RASTERIZER_DESC rasterDesc;
-	ID3D11RasterizerState* rasterState;
 	rasterDesc.AntialiasedLineEnable = false;
 	rasterDesc.CullMode = D3D11_CULL_NONE;
 	rasterDesc.DepthBias = 0;
@@ -431,6 +429,9 @@ void CleanD3D(void)
 	gConstantBuffer->Release();
 	depthStencilView->Release();
 	depthStencilBuffer->Release();
+	rasterState->Release();
+	depthStencilState->Release();
+
 }
 
 // Create shapes to render
