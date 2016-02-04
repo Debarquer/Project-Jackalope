@@ -8,6 +8,8 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 {
     matrix worldViewProj;
 	matrix world;
+	float3 lightColor;
+	float3 lightPosition;
 };
 
 // *** Vertex shader ***
@@ -15,8 +17,9 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR)
 {
     VOut output;
 
+	output.color = float4(position.y/26, position.y/26, position.y/26, 1.0);
+
     output.position = mul(worldViewProj, position);
-    output.color = float4(1, 0.4784313725490196, 0.3411764705882353, 1.0);
 
     return output;
 }
@@ -24,5 +27,5 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR)
 // *** Pixel shader ***
 float4 PShader(float4 position : SV_POSITION, float4 color : COLOR) : SV_TARGET
 {
-    return color;
+	return color;		
 }

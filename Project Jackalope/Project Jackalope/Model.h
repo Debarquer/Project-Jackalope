@@ -16,8 +16,8 @@ public:
 
 	struct Vertex
 	{
-		float pX, pY, pZ, r, g, b, w,
-			nX, nY, nZ, u, v;
+		float pX, pY, pZ, pW, r, g, b, w,
+			nX, nY, nZ, nW, u, v, uu, vv;
 	};
 
 	std::string materialFile;
