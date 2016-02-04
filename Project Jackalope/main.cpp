@@ -94,7 +94,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//modelHandler.addModel(ModelLoader::LoadTextFile("Stormtrooper.obj", failed));
 
 	ModelLoader::HeightMapInfo hmInfo;
-	ModelLoader::HeightMapLoad("heightmap.bmp", hmInfo);
+	ModelLoader::HeightMapLoad("LAND.BMP", hmInfo);
 	modelHandler.addModel(triangulateHeightMapData(CreateGrid(hmInfo), hmInfo));
 	//CreateModelFromHeightMap(hmInfo);
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
