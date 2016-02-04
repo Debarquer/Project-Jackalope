@@ -46,7 +46,7 @@ std::vector<Model::Vertex> CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 	std::vector<DWORD> indices(NumFaces * 3);
 	int k = 0;
 	int texUindex = 0;
-	int texVundex = 0;
+	int texVindex = 0;
 	for (DWORD i = 0; i < rows - 1; i++)
 	{
 		for (DWORD j = 0; j < cols - 1; j++)
@@ -54,37 +54,37 @@ std::vector<Model::Vertex> CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 			//Bottom left
 			indices[k] = i*cols + j;
 			vertex.u = texUindex + 0.0f;
-			vertex.v = texVundex + 1.0f;
+			vertex.v = texVindex + 1.0f;
 			v.push_back(vertex);
 			//Bottom right
 			indices[k + 1] = i*cols + j + 1;
 			vertex.u = texUindex + 1.0f;
-			vertex.v = texVundex + 1.0f;
+			vertex.v = texVindex + 1.0f;
 			v.push_back(vertex);
 			//Top left
 			indices[k + 2] = (i + 1)*cols + j;
 			vertex.u = texUindex + 0.0f;
-			vertex.u = texVundex + 0.0f;
+			vertex.u = texVindex + 0.0f;
 			v.push_back(vertex);
 			//Top left
 			indices[k + 3] = (i + 1)*cols + j;
 			vertex.u = texUindex + 0.0f;
-			vertex.v = texVundex + 0.0f;
+			vertex.v = texVindex + 0.0f;
 			v.push_back(vertex);
 			//Bottom right 
 			indices[k + 4] = i*cols + j + 1;
 			vertex.u = texUindex + 1.0f;
-			vertex.v = texVundex + 1.0f;
+			vertex.v = texVindex + 1.0f;
 			v.push_back(vertex);
 			//Top right
 			indices[k + 5] = (i + 1)*cols + j + 1;
 			vertex.u = texUindex + 1.0f;
-			vertex.v = texVundex + 0.0f;
+			vertex.v = texVindex + 0.0f;
 			v.push_back(vertex);
 			k += 6; //next quad
 			texUindex++;
 		}
-		texVundex++;
+		texVindex++;
 	}
 	return v;
 }
