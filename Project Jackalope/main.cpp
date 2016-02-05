@@ -316,28 +316,6 @@ void InitD3D(HWND hWnd)
 		&dev,
 		NULL,
 		&devcon);
-
-	//Creating depthstencil (though forced to name it depthbuffer) and rasterdesc
-	D3D11_DEPTH_STENCIL_DESC depthBufferDesc;
-
-	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
-
-	depthBufferDesc.DepthEnable = true;
-	depthBufferDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthBufferDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	depthBufferDesc.StencilEnable = true;
-	depthBufferDesc.StencilReadMask = 0xFF;
-	depthBufferDesc.StencilWriteMask = 0xFF;
-	depthBufferDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthBufferDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	depthBufferDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthBufferDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	depthBufferDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthBufferDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	depthBufferDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthBufferDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	dev->CreateDepthStencilState(&depthBufferDesc, &depthStencilState);
-	devcon->OMSetDepthStencilState(depthStencilState, 1);
 		
 	//Describe Depth/Stencil Buffer and create 
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
@@ -355,28 +333,56 @@ void InitD3D(HWND hWnd)
 	depthStencilDesc.MiscFlags = 0;
 
 	dev->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilBuffer);
-	dev->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
 
-	//Rasterizer description
-	D3D11_RASTERIZER_DESC rasterDesc;
-	rasterDesc.AntialiasedLineEnable = false;
-	rasterDesc.CullMode = D3D11_CULL_NONE;
-	rasterDesc.DepthBias = 0;
-	rasterDesc.DepthBiasClamp = 0.0f;
-	rasterDesc.DepthClipEnable = true;
-	rasterDesc.FillMode = D3D11_FILL_SOLID;
-	rasterDesc.FrontCounterClockwise = false;
-	rasterDesc.MultisampleEnable = false;
-	rasterDesc.ScissorEnable = false;
-	rasterDesc.SlopeScaledDepthBias = 0.0f;
-	dev->CreateRasterizerState(&rasterDesc, &rasterState);
-	devcon->RSSetState(rasterState);
+	////Creating depthstencil (though forced to name it depthbuffer) and rasterdesc
+	//D3D11_DEPTH_STENCIL_DESC depthBufferDesc;
+
+	//ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
+
+	//depthBufferDesc.DepthEnable = true;
+	//depthBufferDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	//depthBufferDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	//depthBufferDesc.StencilEnable = true;
+	//depthBufferDesc.StencilReadMask = 0xFF;
+	//depthBufferDesc.StencilWriteMask = 0xFF;
+	//depthBufferDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	//depthBufferDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	//depthBufferDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	//depthBufferDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	//depthBufferDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	//depthBufferDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	//depthBufferDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	//depthBufferDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	//dev->CreateDepthStencilState(&depthBufferDesc, &depthStencilState);
+	//devcon->OMSetDepthStencilState(depthStencilState, 1);
+
+	////Rasterizer description
+	//D3D11_RASTERIZER_DESC rasterDesc;
+	//rasterDesc.AntialiasedLineEnable = false;
+	//rasterDesc.CullMode = D3D11_CULL_NONE;
+	//rasterDesc.DepthBias = 0;
+	//rasterDesc.DepthBiasClamp = 0.0f;
+	//rasterDesc.DepthClipEnable = true;
+	//rasterDesc.FillMode = D3D11_FILL_SOLID;
+	//rasterDesc.FrontCounterClockwise = false;
+	//rasterDesc.MultisampleEnable = false;
+	//rasterDesc.ScissorEnable = false;
+	//rasterDesc.SlopeScaledDepthBias = 0.0f;
+	//dev->CreateRasterizerState(&rasterDesc, &rasterState);
+	//devcon->RSSetState(rasterState);
 
 	swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 
 	dev->CreateRenderTargetView(pBackBuffer, NULL, &backbuffer);
 
-	devcon->OMSetRenderTargets(1, &backbuffer, NULL);
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+	descDSV.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Texture2D.MipSlice = 0;
+
+	dev->CreateDepthStencilView(depthStencilBuffer, &descDSV, &depthStencilView);
+
+	//devcon->OMSetRenderTargets(1, &backbuffer, NULL);
 	devcon->OMSetRenderTargets(1, &backbuffer, depthStencilView);
 
 	// Set the viewport

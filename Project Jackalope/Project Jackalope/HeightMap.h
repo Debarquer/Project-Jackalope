@@ -92,12 +92,13 @@ std::vector<Model::Vertex> CreateGrid(ModelLoader::HeightMapInfo &hminfo)
 std::vector<Model::Vertex> triangulateHeightMapData(std::vector<Model::Vertex> vertices, ModelLoader::HeightMapInfo &hminfo)
 {
 	std::vector<Model::Vertex> tmp;
-	tmp.resize(hminfo.terrainHeight*hminfo.terrainWidth*6);
 
 	for (int i = 0, n = 0; i < hminfo.terrainHeight-1; i++)
 	{
-		for (int y = 0; y < hminfo.terrainWidth; y++, n+=6)
+		for (int y = 0; y < hminfo.terrainWidth-1; y++, n+=6)
 		{
+			tmp.resize(tmp.size() + 6);
+
 			tmp[n].pX = vertices[y + i*hminfo.terrainWidth].pX;
 			tmp[n].pZ = vertices[y + i*hminfo.terrainWidth].pZ;
 			tmp[n].pY = vertices[y + i*hminfo.terrainWidth].pY;
