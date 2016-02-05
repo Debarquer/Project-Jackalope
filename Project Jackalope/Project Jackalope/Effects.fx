@@ -2,6 +2,7 @@ struct VOut
 {
     float4 position : SV_POSITION;
     float4 color : COLOR;
+	float3 normal : NORMAL;
 };
 
 cbuffer VS_CONSTANT_BUFFER : register(b0)
@@ -13,7 +14,7 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 };
 
 // *** Vertex shader ***
-VOut VShader(float4 position : POSITION, float4 color : COLOR)
+VOut VShader(float4 position : POSITION, float4 color : COLOR, float3 normal : NORMAL)
 {
     VOut output;
 
@@ -30,7 +31,7 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR)
 }
 
 // *** Pixel shader ***
-float4 PShader(float4 position : SV_POSITION, float4 color : COLOR) : SV_TARGET
+float4 PShader(float4 position : SV_POSITION, float4 color : COLOR, float3 normal : NORMAL) : SV_TARGET
 {
 	return color;		
 }
