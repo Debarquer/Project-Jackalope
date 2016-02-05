@@ -41,6 +41,7 @@ void Player::update(double dt)
 {
 	DirectX::XMMATRIX RotateY = DirectX::XMMatrixRotationY(rotY);
 	DirectX::XMVECTOR camForward = DirectX::XMVector3TransformCoord(DirectX::XMVECTOR{ 0, 0, 1 }, RotateY);
+	camForward = DirectX::XMVector3Normalize(camForward);
 
 	camera += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);	
 	lookAt += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);

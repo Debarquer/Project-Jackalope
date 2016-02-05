@@ -304,6 +304,11 @@ void InitD3D(HWND hWnd)
 	scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;     
 
 	D3D11CreateDeviceAndSwapChain(
+<<<<<<< HEAD
+=======
+		NULL,
+		D3D_DRIVER_TYPE_HARDWARE,
+>>>>>>> f576716954c8f912434941040d3e58fb92502786
 		NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
 		NULL,
@@ -481,6 +486,6 @@ void InitPipeline()
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	dev->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
+	dev->CreateInputLayout(ied, 3, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
 	devcon->IASetInputLayout(pLayout);
 }
