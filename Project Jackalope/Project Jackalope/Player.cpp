@@ -98,7 +98,7 @@ void Player::rotate(float x, float y, double dt)
 
 	DirectX::XMMATRIX rotationMatrix = rotationMatrixY*rotationMatrixX;
 
-	DirectX::XMVECTOR transformedReference = DirectX::XMVector3Transform(DirectX::XMVECTOR{ 0, 0, 1 }, rotationMatrix);
+	DirectX::XMVECTOR transformedReference = DirectX::XMVector3TransformCoord(DirectX::XMVECTOR{ 0, 0, 1 }, rotationMatrix);
 
 	lookAt = DirectX::operator+(camera, transformedReference);
 	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });

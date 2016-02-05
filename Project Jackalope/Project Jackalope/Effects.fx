@@ -13,17 +13,13 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 };
 
 // *** Vertex shader ***
-VOut VShader(float4 position : POSITION, float4 color : COLOR)
+VOut VShader(float4 position : POSITION, float4 color : COLOR, float3 normal : NORMAL, float2 uv : TEXCOORD)
 {
     VOut output;
 
 	float4 testPos = mul(world, position);
 
-	if(testPos.y < 2)
-		output.color = float4(0.0, 0.0, 1.0, 1.0);
-	else
-		output.color = float4(testPos.y/26, testPos.y/26, testPos.y/26, 1.0);
-
+	output.color = float4(testPos.y/26, testPos.y/26, testPos.y/26, 1.0);
     output.position = mul(worldViewProj, position);
 
     return output;
