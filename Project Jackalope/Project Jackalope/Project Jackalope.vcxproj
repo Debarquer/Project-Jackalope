@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="Heightmap.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelHandler.cpp" />
@@ -154,7 +155,6 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelHandler.h" />
-    <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
