@@ -21,6 +21,18 @@ void Model::LoadModel(Model& other)
 	this->mVertices = other.mVertices;
 }
 
+DirectX::SimpleMath::Vector3 Model::cross(DirectX::SimpleMath::Vector3 v1, DirectX::SimpleMath::Vector3 v2)
+{
+
+	DirectX::SimpleMath::Vector3 output;
+
+	output.x = v1.y * v2.z - v1.z * v2.y;
+	output.y = v1.z * v2.x - v1.x * v2.z;
+	output.z = v1.x * v2.y - v1.y * v2.x;
+
+	return output;
+}
+
 Model Model::LoadTextFile(std::string filename, bool &failed)
 {
 	failed = false;
