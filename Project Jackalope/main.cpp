@@ -300,7 +300,7 @@ void InitD3D(HWND hWnd)
 	scd.Windowed = TRUE;                                    
 	scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;     
 
-	D3D11CreateDeviceAndSwapChain(
+	HRESULT hr2 = D3D11CreateDeviceAndSwapChain(
 		NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
 		NULL,
@@ -329,7 +329,7 @@ void InitD3D(HWND hWnd)
 	depthStencilDesc.CPUAccessFlags = 0;
 	depthStencilDesc.MiscFlags = 0;
 
-	dev->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilBuffer);
+	HRESULT hr = dev->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilBuffer);
 
 	//Creating depthstencil (though forced to name it depthbuffer) and rasterdesc
 	D3D11_DEPTH_STENCIL_DESC depthBufferDesc;
@@ -381,11 +381,12 @@ void InitD3D(HWND hWnd)
 
 	// depth stencil view
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-	descDSV.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
 	descDSV.Texture2D.MipSlice = 0;
+	descDSV.Flags = 0;
 
-	dev->CreateDepthStencilView(depthStencilBuffer, &descDSV, &depthStencilView);
+	hr = dev->CreateDepthStencilView(depthStencilBuffer, &descDSV, &depthStencilView);
 
 	// Bind depth stencil view
 	devcon->OMSetRenderTargets(1, &backbuffer, NULL);
@@ -446,7 +447,7 @@ void CleanD3D(void)
 	gConstantBuffer->Release();
 	depthStencilView->Release();
 	depthStencilBuffer->Release();
-	rasterState->Release();
+	//rasterState->Release();
 	depthStencilState->Release();
 }
 

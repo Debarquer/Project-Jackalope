@@ -1,5 +1,5 @@
 #include "Model.h"
-#include "WICTextureLoader.h"
+//#include "WICTextureLoader.h"
 
 Model::Model()
 {
