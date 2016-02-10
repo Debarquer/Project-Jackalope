@@ -22,7 +22,7 @@ HeightMap::~HeightMap()
 {
 }
 
-void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex> v, std::vector<DWORD> indices)
+void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex>& v, std::vector<DWORD>& indices)
 {
 		cols = hminfo.terrainWidth;
 		rows = hminfo.terrainHeight;
