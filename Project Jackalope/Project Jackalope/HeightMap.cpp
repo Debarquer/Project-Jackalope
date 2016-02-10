@@ -13,7 +13,6 @@ std::vector<DWORD>& HeightMap::getIndices()
 HeightMap::HeightMap()
 {
 	NumFaces = 0;
-	NumVertices = 0;
 	cols = 0;
 	rows = 0;
 }
@@ -27,7 +26,6 @@ void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex>& v
 		cols = hminfo.terrainWidth;
 		rows = hminfo.terrainHeight;
 		//Create the grid
-		//NumVertices = rows * cols;
 		NumFaces = (rows - 1) * (cols - 1) * 2;
 		Model::Vertex vertex;
 		for (DWORD i = 0; i < rows; i++)
@@ -50,17 +48,17 @@ void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex>& v
 			{
 				for (DWORD j = 0; j < cols - 1; j++)
 				{
-					//Bottom left
+					//Top left
 					indices.push_back(i*cols + j);
 					//Bottom right
-					indices.push_back(i*cols + j + 1);
-					//Top left
+					indices.push_back((i + 1)*cols + j + 1);
+					//Bottom left
 					indices.push_back((i + 1)*cols + j);
 					//Top left
-					indices.push_back((i + 1)*cols + j);
-					//Bottom right 
+					indices.push_back(i*cols + j);
+					//Top right 
 					indices.push_back(i*cols + j + 1);
-					//Top right
+					//Bottom right
 					indices.push_back((i + 1)*cols + j + 1);
 			}
 		}

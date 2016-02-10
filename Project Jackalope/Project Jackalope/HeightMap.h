@@ -12,7 +12,6 @@ private:
 
 public:
 	int NumFaces;
-	int NumVertices;
 	int cols;
 	int rows;
 
