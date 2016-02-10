@@ -39,6 +39,7 @@ ID3D11InputLayout *pLayout = nullptr;
 ID3D11VertexShader *pVS = nullptr;
 ID3D11PixelShader *pPS = nullptr;
 ID3D11Buffer *pVBuffer = nullptr;
+ID3D11Buffer *pIBuffer = nullptr;
 ID3D11Buffer* gConstantBuffer = nullptr;
 ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer = nullptr;
@@ -94,9 +95,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//modelHandler.addModel(ModelLoader::LoadTextFile("Stormtrooper.obj", failed));
 
 	hm.HeightMapLoad("heightmap.bmp", hmInfo);
-	hm.CreateGrid(hmInfo, hm.getV());
-	//modelHandler.addModel(triangulateHeightMapData(CreateGrid(hmInfo), hmInfo));
-	//CreateModelFromHeightMap(hmInfo);
+	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 
 	light.r = 1;
@@ -425,8 +424,9 @@ void RenderFrame(void)
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		
-	devcon->Draw(modelHandler.getVertices().size(), 0);
+	
+	devcon->DrawIndexed(1000, 0, 0);
+	//devcon->Draw(modelHandler.getVertices().size(), 0);
 	swapchain->Present(0, 0);
 }
 
@@ -454,22 +454,42 @@ void CleanD3D(void)
 // Create shapes to render
 void InitGraphics()
 {
+	// create the index buffer
+	D3D11_BUFFER_DESC ibd;
+	ZeroMemory(&ibd, sizeof(ibd));
+	ibd.Usage = D3D11_USAGE_DEFAULT;
+	ibd.ByteWidth = sizeof(DWORD) * hm.NumFaces * 3;
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibd.CPUAccessFlags = 0;
+	ibd.MiscFlags = 0;
+	D3D11_SUBRESOURCE_DATA iinitData;
+	iinitData.pSysMem = hm.getIndices().data();
+	iinitData.SysMemPitch = 0;
+	iinitData.SysMemSlicePitch = 0;
+	dev->CreateBuffer(&ibd, &iinitData, &pIBuffer);
+	devcon->IASetIndexBuffer(pIBuffer, DXGI_FORMAT_R32_UINT, 0);
+
 	// create the vertex buffer
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 
 	bd.Usage = D3D11_USAGE_DYNAMIC;                
-	bd.ByteWidth = sizeof(Model::Vertex)*modelHandler.getVertices().size();           
+	bd.ByteWidth = sizeof(Model::Vertex)*hm.NumVertices;           
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;   
-
+	bd.CPUAccessFlags = 0;   
+	bd.MiscFlags = 0;
+	D3D11_SUBRESOURCE_DATA vertexBufferData;
+	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
+	vertexBufferData.pSysMem = hm.getV().data();
+	vertexBufferData.SysMemPitch = 0;
+	vertexBufferData.SysMemSlicePitch = 0;
 	dev->CreateBuffer(&bd, NULL, &pVBuffer); 
 
 	// copy the vertices into the buffer
-	D3D11_MAPPED_SUBRESOURCE ms;
-	devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);    
-	memcpy(ms.pData, modelHandler.getVertices().data(), sizeof(Model::Vertex)*modelHandler.getVertices().size());      
-	devcon->Unmap(pVBuffer, NULL);                                    
+	/*D3D11_MAPPED_SUBRESOURCE ms;
+	devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	memcpy(ms.pData, hm.getV().data(), sizeof(Model::Vertex)*hm.getV().size());      
+	devcon->Unmap(pVBuffer, NULL);   */                                 
 }
 
 // Loads and prepares the shaders

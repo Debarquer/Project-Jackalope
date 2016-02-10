@@ -16,22 +16,18 @@ HeightMap::HeightMap()
 	NumVertices = 0;
 	cols = 0;
 	rows = 0;
-	texUindex = 0;
-	texVindex = 0;
 }
 
 HeightMap::~HeightMap()
 {
 }
 
-void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex> v)
+void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex> v, std::vector<DWORD> indices)
 {
 		cols = hminfo.terrainWidth;
 		rows = hminfo.terrainHeight;
-		texUindex = 0;
-		texVindex = 0;
 		//Create the grid
-		NumVertices = rows * cols;
+		//NumVertices = rows * cols;
 		NumFaces = (rows - 1) * (cols - 1) * 2;
 		Model::Vertex vertex;
 		for (DWORD i = 0; i < rows; i++)
@@ -44,41 +40,30 @@ void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex> v)
 				vertex.nX = 0.0f;
 				vertex.nY = 1.0f;
 				vertex.nZ = 0.0f;
-				vertex.u = texUindex;
-				vertex.v = texVindex;
 				v.push_back(vertex);
 				hminfo.numVertices++;
-				texUindex++;
 			}
-			texUindex = 0;
-			texVindex++;
+		
 		}
-}
-
-void HeightMap::Triangulate(std::vector<DWORD> indices)
-{
-	// Creating index list
-	std::vector<DWORD> indices(NumFaces * 3);
-	int k = 0;
-	for (DWORD i = 0; i < rows - 1; i++)
-	{
-		for (DWORD j = 0; j < cols - 1; j++)
-		{
-			//Bottom left
-			indices[k] = i*cols + j;
-			//Bottom right
-			indices[k + 1] = i*cols + j + 1;
-			//Top left
-			indices[k + 2] = (i + 1)*cols + j;
-			//Top left
-			indices[k + 3] = (i + 1)*cols + j;
-			//Bottom right 
-			indices[k + 4] = i*cols + j + 1;
-			//Top right
-			indices[k + 5] = (i + 1)*cols + j + 1;
-			k += 6; //next quad
+			// Creating index list
+			for (DWORD i = 0; i < rows - 1; i++)
+			{
+				for (DWORD j = 0; j < cols - 1; j++)
+				{
+					//Bottom left
+					indices.push_back(i*cols + j);
+					//Bottom right
+					indices.push_back(i*cols + j + 1);
+					//Top left
+					indices.push_back((i + 1)*cols + j);
+					//Top left
+					indices.push_back((i + 1)*cols + j);
+					//Bottom right 
+					indices.push_back(i*cols + j + 1);
+					//Top right
+					indices.push_back((i + 1)*cols + j + 1);
+			}
 		}
-	}
 }
 
 bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo)
@@ -117,7 +102,7 @@ bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo)
 
 	hminfo.heightMap = new XMFLOAT3[hminfo.terrainWidth * hminfo.terrainHeight];
 
-	int k = 0;
+	int l = 0;
 
 	float heightFactor = 10.0f;
 	for (int j = 0; j < hminfo.terrainHeight; j++)
@@ -125,12 +110,12 @@ bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo)
 		for (int i = 0; i < hminfo.terrainWidth; i++)
 		{
 
-			height = bitmapImage[k];
+			height = bitmapImage[l];
 			index = (hminfo.terrainHeight * j) + i;
 			hminfo.heightMap[index].x = (float)i;
 			hminfo.heightMap[index].y = (float)height / heightFactor;
 			hminfo.heightMap[index].z = (float)j;
-			k += 3;
+			l += 3;
 		}
 
 	}

@@ -28,7 +28,7 @@ public:
 	~Model();
 
 	void LoadModel(Model& other);
-	DirectX::SimpleMath::Vector3 cross(DirectX::SimpleMath::Vector3 v1, DirectX::SimpleMath::Vector3 v2);
+	DirectX::XMFLOAT3 cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2);
 	static Model LoadTextFile(std::string filename, bool &failed);
 };
 
