@@ -29,6 +29,7 @@ public:
 	~Model();
 
 	void LoadModel(Model& other);
-	static Model LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev, ID3D11DeviceContext* devcon);
+	DirectX::XMFLOAT3 cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2);
+	static Model LoadTextFile(std::string filename, bool &failed);
 };
 

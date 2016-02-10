@@ -6,10 +6,21 @@ Player::Player()
 	currentSpeed = DirectX::SimpleMath::Vector3( 0, 0, 0 );
 	maxSpeed = DirectX::SimpleMath::Vector3( 100, 1500, 100 );
 
-	camera = DirectX::SimpleMath::Vector3( 0, 0, -2 );
-	lookAt = DirectX::SimpleMath::Vector3( 0, 0, 0 );
+	camera = XMVectorSet( 0.0f, 50.0f, -2.0f, 0.0f);
+	lookAt = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
-	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });
+	DefaultFoward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	DefaultRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	camForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	camRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0.0f, 1.0f, 0.0f });
+	rotY = 0.0f;
+	rotX = 0.0f;
+
+	moveLeftRight = 0.0f;
+	moveBackForward = 0.0f;
 
 	movedX = false;
 	movedZ = false;
@@ -39,26 +50,43 @@ void Player::move(DirectX::SimpleMath::Vector3 movement, double dt)
 
 void Player::update(double dt)
 {
-	DirectX::XMMATRIX RotateY = DirectX::XMMatrixRotationY(rotY);
-	DirectX::XMVECTOR camForward = DirectX::XMVector3TransformCoord(DirectX::XMVECTOR{ 0, 0, 1 }, RotateY);
-	camForward = DirectX::XMVector3Normalize(camForward);
 
-	camera += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);	
-	lookAt += DirectX::XMVectorScale(DirectX::operator*(currentSpeed, camForward), dt);
+	camRotationMatrix = XMMatrixRotationRollPitchYaw(rotX, rotY, 0.0f);
 
+	//DirectX::XMMATRIX RotateY = DirectX::XMMatrixRotationY(rotY);
+	lookAt = DirectX::XMVector3TransformCoord(DefaultFoward, camRotationMatrix);
+	lookAt = DirectX::XMVector3Normalize(lookAt);
+
+	XMMATRIX RotateYTempMatrix;
+	RotateYTempMatrix = XMMatrixRotationY(rotX);
+
+	camRight = XMVector3TransformCoord(DefaultRight, RotateYTempMatrix);
+
+	camUp = XMVector3TransformCoord(camUp, RotateYTempMatrix);
+	camForward = XMVector3TransformCoord(DefaultFoward, RotateYTempMatrix);
+
+	camera += moveLeftRight*camRight;
+	camera += moveBackForward*camForward;
+
+	moveBackForward = 0.0f;
+	moveLeftRight = 0.0f;
+
+	lookAt = camera + lookAt;
+
+	view = XMMatrixLookAtLH(camera, lookAt, camUp);
 	//camera += dt*currentSpeed;
 	//lookAt += dt*currentSpeed;
 
-	if (camera.y > 0)
+	if (XMVectorGetY(camera) > 0)
 	{
 		isAirborne = true;
 		currentSpeed.y -= dt*9.81;
 	}
-	else if(camera.y <= 0)
+	else if(XMVectorGetY(camera) <= 0)
 	{
 		isAirborne = false;
 		currentSpeed.y = 0;
-		camera.y = 0;
+		XMVectorSetY(camera, 0.0f);
 		//lookAt.y = 0;
 	}
 		
@@ -74,7 +102,7 @@ void Player::update(double dt)
 	movedX = false;
 	movedZ = false;
 
-	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });
+	view = XMMatrixLookAtLH(camera, lookAt, camUp);
 }
 
 void Player::jump(double dt)
@@ -94,13 +122,10 @@ void Player::rotate(float x, float y, double dt)
 		//rotY = -0.25;
 	rotX += x*dt;
 
-	DirectX::XMMATRIX rotationMatrixY = DirectX::XMMatrixRotationX(rotY);
-	DirectX::XMMATRIX rotationMatrixX = DirectX::XMMatrixRotationY(rotX);
+	camRotationMatrix = XMMatrixRotationRollPitchYaw(rotX, rotY, 0.0f);
 
-	DirectX::XMMATRIX rotationMatrix = rotationMatrixY*rotationMatrixX;
-
-	DirectX::XMVECTOR transformedReference = DirectX::XMVector3TransformCoord(DirectX::XMVECTOR{ 0, 0, 1 }, rotationMatrix);
+	DirectX::XMVECTOR transformedReference = DirectX::XMVector3TransformCoord(camForward, camRotationMatrix);
 
 	lookAt = DirectX::operator+(camera, transformedReference);
-	view = DirectX::XMMatrixLookAtLH(camera, lookAt, DirectX::XMVECTOR{ 0, 1, 0 });
+	view = DirectX::XMMatrixLookAtLH(camera, lookAt, camUp);
 }

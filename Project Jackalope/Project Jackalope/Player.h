@@ -6,25 +6,33 @@
 #include <windowsx.h>
 #include "SimpleMath.h"
 
+using namespace DirectX;
+
 class Player
 {
 private:
 	bool movedX, movedZ, isAirborne;
 
-	DirectX::SimpleMath::Vector3 movementSpeed;
-	DirectX::SimpleMath::Vector3 currentSpeed;
-	DirectX::SimpleMath::Vector3 maxSpeed;
-
-	float rotY = 0.0f;
-	float rotX = 0.0f;
+	SimpleMath::Vector3 movementSpeed;
+	SimpleMath::Vector3 currentSpeed;
+	SimpleMath::Vector3 maxSpeed;
+	XMVECTOR DefaultFoward;
+	XMVECTOR DefaultRight;
+	XMVECTOR camForward;
+	XMVECTOR camRight;
+	XMVECTOR camUp;
+	float rotY;
+	float rotX;
 
 public:
 
-	DirectX::SimpleMath::Vector3 camera;
-	DirectX::SimpleMath::Vector3 lookAt;
-
-	DirectX::XMMATRIX view;
-
+	XMVECTOR camera;
+	XMVECTOR lookAt;
+	float moveLeftRight = 0.0f;
+	float moveBackForward = 0.0f;
+	XMMATRIX view;
+	XMMATRIX camRotationMatrix;
+	
 	void move(DirectX::SimpleMath::Vector3 movement, double dt);
 	void update(double dt);
 
