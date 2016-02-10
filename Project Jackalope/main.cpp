@@ -91,7 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hWnd, nCmdShow);
 
 	bool failed;
-	//modelHandler.addModel(Model::LoadTextFile("untitled.obj", failed, dev, devcon));
+	//modelHandler.addModel(Model::LoadTextFile("untitled.obj", failed));
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
 	hm.HeightMapLoad("heightmap.bmp", hmInfo);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
@@ -425,8 +425,9 @@ void RenderFrame(void)
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
-	devcon->DrawIndexed(1000, 0, 0);
-	//devcon->Draw(modelHandler.getVertices().size(), 0);
+	devcon->DrawIndexed(hm.getIndices().size(), 0, 0);
+	//if(!modelHandler.getVertices().empty())
+	//	devcon->Draw(modelHandler.getVertices().size(), 0);
 	swapchain->Present(0, 0);
 }
 
@@ -489,7 +490,12 @@ void InitGraphics()
 	//D3D11_MAPPED_SUBRESOURCE ms;
 	/*devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
 	memcpy(ms.pData, hm.getV().data(), sizeof(Model::Vertex)*hm.getV().size());      
-	devcon->Unmap(pVBuffer, NULL);    */                                
+	devcon->Unmap(pVBuffer, NULL);    */   
+
+	//D3D11_MAPPED_SUBRESOURCE ms;
+	//devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	//memcpy(ms.pData, modelHandler.getVertices().data(), sizeof(Model::Vertex)*modelHandler.getVertices().size());
+	//devcon->Unmap(pVBuffer, NULL);    
 }
 
 // Loads and prepares the shaders
@@ -514,6 +520,6 @@ void InitPipeline()
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	
-	dev->CreateInputLayout(ied, 3, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
+	dev->CreateInputLayout(ied, 4, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
 	devcon->IASetInputLayout(pLayout);
 }

@@ -6,7 +6,7 @@ Player::Player()
 	currentSpeed = DirectX::SimpleMath::Vector3( 0, 0, 0 );
 	maxSpeed = DirectX::SimpleMath::Vector3( 100, 1500, 100 );
 
-	camera = XMVectorSet( 0.0f, 50.0f, -2.0f, 0.0f);
+	camera = XMVectorSet( 0.0f, 250.0f, -2.0f, 0.0f);
 	lookAt = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
 	DefaultFoward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
