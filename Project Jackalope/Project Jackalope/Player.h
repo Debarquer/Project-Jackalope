@@ -33,7 +33,8 @@ public:
 	XMMATRIX view;
 	XMMATRIX camRotationMatrix;
 	
-	void move(DirectX::SimpleMath::Vector3 movement, double dt);
+	void move(XMVECTOR movement, double dt);
+	void strafe(XMVECTOR movement, double dt);
 	void update(double dt);
 
 	void jump(double dt);

@@ -118,7 +118,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-
 		else
 		{
 			clock_t prevTime = clock();
@@ -133,6 +132,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				movement += DirectX::SimpleMath::Vector3(-1, 0, 0);
 
 			player.move(movement, dt);
+			player.strafe(movement, dt);
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
 			player.update(dt);
 
@@ -247,7 +247,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 void CreateConstantBuffer()
 {
 	XMMATRIX world = XMMatrixRotationY(0);
-	XMMATRIX view = XMMatrixLookAtLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
+	XMMATRIX view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(90), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
 	XMMATRIX worldViewProj = world * view * proj;
 	
@@ -281,6 +281,7 @@ void CreateConstantBuffer()
 
 	angle += + 1 * dt;
 	devcon->UpdateSubresource(gConstantBuffer, 0, 0, &VsConstData, 0, 0);
+	gConstantBuffer->Release();
 }
 
 void InitD3D(HWND hWnd)
@@ -445,7 +446,7 @@ void CleanD3D(void)
 	dev->Release();
 	devcon->Release();
 	pBackBuffer->Release();
-	gConstantBuffer->Release();
+	//gConstantBuffer->Release();
 	depthStencilView->Release();
 	depthStencilBuffer->Release();
 	//rasterState->Release();
