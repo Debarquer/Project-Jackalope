@@ -162,6 +162,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			CreateConstantBuffer();
 			RenderFrame();
+			gConstantBuffer->Release();
 
 			clock_t diffTime = clock() - prevTime;
 			dt = (float)(diffTime) / CLOCKS_PER_SEC;
@@ -281,7 +282,6 @@ void CreateConstantBuffer()
 
 	angle += + 1 * dt;
 	devcon->UpdateSubresource(gConstantBuffer, 0, 0, &VsConstData, 0, 0);
-	gConstantBuffer->Release();
 }
 
 void InitD3D(HWND hWnd)
