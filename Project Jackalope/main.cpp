@@ -472,8 +472,8 @@ void InitGraphics()
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(Model::Vertex)*hm.NumVertices;           
+	bd.Usage = D3D11_USAGE_DEFAULT;                
+	bd.ByteWidth = sizeof(Model::Vertex)*hmInfo.numVertices;           
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       
 	bd.CPUAccessFlags = 0;   
 	bd.MiscFlags = 0;
@@ -485,10 +485,10 @@ void InitGraphics()
 	HRESULT hr = dev->CreateBuffer(&bd, &vertexBufferData, &pVBuffer);
 
 	// copy the vertices into the buffer
-	/*D3D11_MAPPED_SUBRESOURCE ms;
-	devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	//D3D11_MAPPED_SUBRESOURCE ms;
+	/*devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
 	memcpy(ms.pData, hm.getV().data(), sizeof(Model::Vertex)*hm.getV().size());      
-	devcon->Unmap(pVBuffer, NULL);   */                                 
+	devcon->Unmap(pVBuffer, NULL);    */                                
 }
 
 // Loads and prepares the shaders
