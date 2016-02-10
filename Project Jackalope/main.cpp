@@ -91,18 +91,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hWnd, nCmdShow);
 
 	bool failed;
-	modelHandler.addModel(Model::LoadTextFile("untitled.obj", failed, dev, devcon));
+	//modelHandler.addModel(Model::LoadTextFile("untitled.obj", failed, dev, devcon));
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
-
-<<<<<<< HEAD
-	//ModelLoader::HeightMapInfo hmInfo;
-	//ModelLoader::HeightMapLoad("heightmap.bmp", hmInfo);
-	//modelHandler.addModel(triangulateHeightMapData(CreateGrid(hmInfo), hmInfo));
-	//CreateModelFromHeightMap(hmInfo);
-=======
 	hm.HeightMapLoad("heightmap.bmp", hmInfo);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
->>>>>>> 19f5eb9a8992c573bdea8082a27284dcae119fac
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 
 	light.r = 1;
@@ -480,7 +472,7 @@ void InitGraphics()
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 
-	bd.Usage = D3D11_USAGE_DYNAMIC;                
+	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.ByteWidth = sizeof(Model::Vertex)*hm.NumVertices;           
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       
 	bd.CPUAccessFlags = 0;   
@@ -490,7 +482,7 @@ void InitGraphics()
 	vertexBufferData.pSysMem = hm.getV().data();
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
-	dev->CreateBuffer(&bd, NULL, &pVBuffer); 
+	HRESULT hr = dev->CreateBuffer(&bd, &vertexBufferData, &pVBuffer);
 
 	// copy the vertices into the buffer
 	/*D3D11_MAPPED_SUBRESOURCE ms;

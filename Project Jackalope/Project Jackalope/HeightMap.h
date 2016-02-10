@@ -27,6 +27,6 @@ public:
 	std::vector<DWORD>& getIndices();
 	HeightMap();
 	~HeightMap();
-	void CreateGrid(HeightMapInfo &hminfo, std::vector <Model::Vertex> v, std::vector <DWORD> indices);
+	void CreateGrid(HeightMapInfo &hminfo, std::vector <Model::Vertex>& v, std::vector <DWORD>& indices);
 	bool HeightMapLoad(char* filename, HeightMapInfo &hminfo);
 };

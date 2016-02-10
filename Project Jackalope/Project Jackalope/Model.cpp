@@ -22,9 +22,6 @@ void Model::LoadModel(Model& other)
 	this->mVertices = other.mVertices;
 }
 
-<<<<<<< HEAD
-Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev, ID3D11DeviceContext* devcon)
-=======
 DirectX::XMFLOAT3 Model::cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2)
 {
 	DirectX::SimpleMath::Vector3 output;
@@ -37,7 +34,6 @@ DirectX::XMFLOAT3 Model::cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2)
 }
 
 Model Model::LoadTextFile(std::string filename, bool &failed)
->>>>>>> 19f5eb9a8992c573bdea8082a27284dcae119fac
 {
 	bool hadMaterialFile, hadMaterial;
 	failed = false;
