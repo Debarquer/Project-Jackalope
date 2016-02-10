@@ -20,7 +20,7 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR, float3 normal : N
 
 	float4 testPos = mul(world, position);
 
-	output.color = float4(testPos.y/26, testPos.y/26, testPos.y/26, 1.0);
+	output.color = color;//float4(testPos.y/26, testPos.y/26, testPos.y/26, 1.0);
     output.position = mul(worldViewProj, position);
 
     return output;

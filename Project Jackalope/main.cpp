@@ -90,12 +90,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hWnd, nCmdShow);
 
 	bool failed;
-	//modelHandler.addModel(ModelLoader::LoadTextFile("untitled.obj", failed));
-	//modelHandler.addModel(ModelLoader::LoadTextFile("Stormtrooper.obj", failed));
+	modelHandler.addModel(Model::LoadTextFile("untitled.obj", failed, dev, devcon));
+	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
 
-	ModelLoader::HeightMapInfo hmInfo;
-	ModelLoader::HeightMapLoad("heightmap.bmp", hmInfo);
-	modelHandler.addModel(triangulateHeightMapData(CreateGrid(hmInfo), hmInfo));
+	//ModelLoader::HeightMapInfo hmInfo;
+	//ModelLoader::HeightMapLoad("heightmap.bmp", hmInfo);
+	//modelHandler.addModel(triangulateHeightMapData(CreateGrid(hmInfo), hmInfo));
 	//CreateModelFromHeightMap(hmInfo);
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 
@@ -251,9 +251,9 @@ void CreateConstantBuffer()
 {
 	XMMATRIX world = XMMatrixRotationY(0);
 	XMMATRIX view = XMMatrixLookAtLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(3.14 * 0.45, SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(90), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
 	XMMATRIX worldViewProj = world * view * proj;
-
+	
 	struct VS_CONSTANT_BUFFER
 	{
 		XMMATRIX worldViewProj;
@@ -486,7 +486,7 @@ void InitPipeline()
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-
+	
 	dev->CreateInputLayout(ied, 3, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
 	devcon->IASetInputLayout(pLayout);
 }

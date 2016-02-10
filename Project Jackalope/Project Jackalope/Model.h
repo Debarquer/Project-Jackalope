@@ -23,11 +23,12 @@ public:
 	std::string materialFile;
 	std::string material;
 	std::vector<Vertex> mVertices;
+	ID3D11Texture2D* texture;
 
 	Model();
 	~Model();
 
 	void LoadModel(Model& other);
-	static Model LoadTextFile(std::string filename, bool &failed);
+	static Model LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev, ID3D11DeviceContext* devcon);
 };
 
