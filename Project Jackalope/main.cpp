@@ -346,13 +346,13 @@ void InitD3D(HWND hWnd)
 
 	// Stencil operations if pixel is front-facing
 	depthBufferDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthBufferDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthBufferDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
 	depthBufferDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthBufferDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	// Stencil operations if pixel is back-facing
 	depthBufferDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthBufferDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthBufferDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
 	depthBufferDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthBufferDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
@@ -360,7 +360,7 @@ void InitD3D(HWND hWnd)
 	devcon->OMSetDepthStencilState(depthStencilState, 1);
 
 	//Rasterizer description
-	/*D3D11_RASTERIZER_DESC rasterDesc;
+	D3D11_RASTERIZER_DESC rasterDesc;
 
 	rasterDesc.AntialiasedLineEnable = false;
 	rasterDesc.CullMode = D3D11_CULL_NONE;
@@ -374,7 +374,7 @@ void InitD3D(HWND hWnd)
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
 	dev->CreateRasterizerState(&rasterDesc, &rasterState);
-	devcon->RSSetState(rasterState);*/
+	devcon->RSSetState(rasterState);
 
 	swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 	dev->CreateRenderTargetView(pBackBuffer, NULL, &backbuffer);
