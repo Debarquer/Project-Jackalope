@@ -1,8 +1,9 @@
 #include "Model.h"
-
+#include "WICTextureLoader.h"
 
 Model::Model()
 {
+	texture = nullptr;
 }
 
 //Model::Model(Model& other)
@@ -21,6 +22,9 @@ void Model::LoadModel(Model& other)
 	this->mVertices = other.mVertices;
 }
 
+<<<<<<< HEAD
+Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev, ID3D11DeviceContext* devcon)
+=======
 DirectX::XMFLOAT3 Model::cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2)
 {
 	DirectX::SimpleMath::Vector3 output;
@@ -33,7 +37,9 @@ DirectX::XMFLOAT3 Model::cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2)
 }
 
 Model Model::LoadTextFile(std::string filename, bool &failed)
+>>>>>>> 19f5eb9a8992c573bdea8082a27284dcae119fac
 {
+	bool hadMaterialFile, hadMaterial;
 	failed = false;
 
 	Model model;
@@ -78,12 +84,14 @@ Model Model::LoadTextFile(std::string filename, bool &failed)
 			char tmpFilePath[128];
 			fscanf(file, "%s", &tmpFilePath);
 			model.materialFile = tmpFilePath;
+			hadMaterialFile = true;
 		}
 		else if (strcmp(lineHeader, "usemtl") == 0)
 		{
 			char tmpFileName[128];
 			fscanf(file, "%s", &tmpFileName);
 			model.material = tmpFileName;
+			hadMaterial = true;
 		}
 		else if (strcmp(lineHeader, "f") == 0)
 		{
@@ -131,6 +139,31 @@ Model Model::LoadTextFile(std::string filename, bool &failed)
 		vertex.v = tempUvs[uvIndex - 1].y;
 
 		model.mVertices.push_back(vertex);
+	}
+
+	if (!hadMaterial || !hadMaterialFile)
+	{
+		hadMaterial = "NULL";
+		hadMaterialFile = "NULL";
+	}
+	else
+	{
+		std::string fileName;
+		for (int i = 0; model.materialFile[i] != '.'; i++)
+		{
+			filename += model.materialFile[i];
+		}
+		filename += ".png";
+
+		wchar_t* wide_string = new wchar_t[filename.length() + 1];
+		std::copy(filename.begin(), filename.end(), wide_string);
+		wide_string[filename.length()] = 0;
+
+		ID3D11Texture2D* texture = NULL;
+		ID3D11Resource* texRes = NULL;
+		ID3D11ShaderResourceView* texView = NULL;
+
+		//DirectX::CreateWICTextureFromFile(dev, devcon, wide_string, &texRes, &texView, (size_t)0Ui64);
 	}
 
 	fclose(file);

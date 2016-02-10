@@ -23,6 +23,7 @@ public:
 	std::string materialFile;
 	std::string material;
 	std::vector<Vertex> mVertices;
+	ID3D11Texture2D* texture;
 
 	Model();
 	~Model();
