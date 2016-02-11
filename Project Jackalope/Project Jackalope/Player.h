@@ -23,6 +23,7 @@ private:
 	XMVECTOR camUp;
 	float rotY;
 	float rotX;
+	float rotationAngle;
 
 public:
 
@@ -35,10 +36,10 @@ public:
 	
 	void move(XMVECTOR movement, double dt);
 	void strafe(XMVECTOR movement, double dt);
-	void update(double dt);
+	void pitch(float direction, double dt);
+	void yaw(float direction, double dt);
 
 	void jump(double dt);
-	void rotate(float x, float y, double dt);
 
 	Player();
 	~Player();

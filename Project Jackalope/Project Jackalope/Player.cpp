@@ -19,6 +19,7 @@ Player::Player()
 	
 	rotY = 0.0f;
 	rotX = 0.0f;
+	rotationAngle = 1;
 
 	moveLeftRight = 0.0f;
 	moveBackForward = 0.0f;
@@ -53,10 +54,18 @@ void Player::strafe(XMVECTOR movement, double dt)
 	camera = DirectX::XMVectorMultiplyAdd(s, r, p);
 }
 
-void Player::update(double dt)
+void Player::pitch(float direction, double dt)
 {
+	XMMATRIX R = XMMatrixRotationAxis(camRight, direction * rotationAngle * dt);
+	camUp = XMVector3TransformNormal(camUp, R);
+	lookAt = XMVector3TransformNormal(lookAt, R);
+}
 
-	
+void Player::yaw(float direction, double dt)
+{
+	XMMATRIX R = XMMatrixRotationY(direction * rotationAngle  * dt);
+	camRight = XMVector3TransformNormal(camRight, R);
+	lookAt = XMVector3TransformNormal(lookAt, R);
 }
 
 void Player::jump(double dt)
@@ -65,9 +74,4 @@ void Player::jump(double dt)
 		return;
 
 	currentSpeed.y = movementSpeed.y;
-}
-
-void Player::rotate(float x, float y, double dt)
-{
-
 }

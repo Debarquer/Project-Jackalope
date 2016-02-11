@@ -23,8 +23,8 @@ Light light;
 Player player;
 double dt;
 
-#define SCREEN_WIDTH  800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH  1366
+#define SCREEN_HEIGHT 768
 
 //movement booleans
 bool upIsPressed = false, downIsPressed = false, leftIsPressed = false, rightIsPressed = false;
@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.hInstance = hInstance;
 	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	//wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wc.lpszMenuName = NULL;
 	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	wc.lpszClassName = L"WindowClass1";
@@ -134,7 +134,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			player.move(movement, dt);
 			player.strafe(movement, dt);
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
-			player.update(dt);
+			//player.update(dt);
 
 			POINT p;
 			GetCursorPos(&p);
@@ -145,19 +145,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			//than the entire screen, producing suboptimal results.
 			if (p.y > SCREEN_HEIGHT - (SCREEN_HEIGHT / 10))
 			{
-				player.rotate(0, 1, dt);
+				player.pitch(1, dt);
 			}
 			else if (p.y < (SCREEN_HEIGHT / 10))
 			{
-				player.rotate(0, -1, dt);
+				player.pitch(-1, dt);
 			}
 			if (p.x > SCREEN_WIDTH - (SCREEN_WIDTH / 10))
 			{
-				player.rotate(1, 0, dt);
+				player.yaw(1, dt);
 			}
 			else if (p.x < (SCREEN_WIDTH / 10))
 			{
-				player.rotate(-1, 0, dt);
+				player.yaw(-1, dt);
 			}
 
 			CreateConstantBuffer();
@@ -248,9 +248,9 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 void CreateConstantBuffer()
 {
 	XMMATRIX world = XMMatrixRotationY(0);
-	XMMATRIX view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
+	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(90), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
-	XMMATRIX worldViewProj = world * view * proj;
+	XMMATRIX worldViewProj = world * player.view * proj;
 	
 	struct VS_CONSTANT_BUFFER
 	{
@@ -407,6 +407,7 @@ void InitD3D(HWND hWnd)
 	devcon->RSSetViewports(1, &viewport);
 
 	//ShowCursor(false);
+	swapchain->SetFullscreenState(true, NULL);
 
 	InitPipeline();
 	InitGraphics();
