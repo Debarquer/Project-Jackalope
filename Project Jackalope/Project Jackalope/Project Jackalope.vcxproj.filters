@@ -74,5 +74,8 @@
     <Image Include="heightmap.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Map.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

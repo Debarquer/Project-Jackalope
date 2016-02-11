@@ -93,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	bool failed;
 	//modelHandler.addModel(Model::LoadTextFile("untitled.obj", failed));
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
-	hm.HeightMapLoad("heightmap.bmp", hmInfo);
+	hm.HeightMapLoad("Map.bmp", hmInfo);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 
@@ -143,19 +143,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			//the SCREEN_HEIGHT and SCREEN_WIDTH are hardcoded, and
 			//only represent the window size, which currently is smaller
 			//than the entire screen, producing suboptimal results.
-			if (p.y > SCREEN_HEIGHT - (SCREEN_HEIGHT / 10))
+			if (p.y > SCREEN_HEIGHT - (SCREEN_HEIGHT / 100))
 			{
 				player.pitch(1, dt);
 			}
-			else if (p.y < (SCREEN_HEIGHT / 10))
+			else if (p.y < (SCREEN_HEIGHT / 100))
 			{
 				player.pitch(-1, dt);
 			}
-			if (p.x > SCREEN_WIDTH - (SCREEN_WIDTH / 10))
+			if (p.x > SCREEN_WIDTH - (SCREEN_WIDTH / 100))
 			{
 				player.yaw(1, dt);
 			}
-			else if (p.x < (SCREEN_WIDTH / 10))
+			else if (p.x < (SCREEN_WIDTH / 100))
 			{
 				player.yaw(-1, dt);
 			}
