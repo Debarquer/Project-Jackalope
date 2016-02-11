@@ -23,8 +23,8 @@ Light light;
 Player player;
 double dt;
 
-#define SCREEN_WIDTH  1366
-#define SCREEN_HEIGHT 768
+#define SCREEN_WIDTH  800
+#define SCREEN_HEIGHT 600
 
 //movement booleans
 bool upIsPressed = false, downIsPressed = false, leftIsPressed = false, rightIsPressed = false;
@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.hInstance = hInstance;
 	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	//wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wc.lpszMenuName = NULL;
 	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	wc.lpszClassName = L"WindowClass1";
@@ -95,6 +95,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
 	hm.HeightMapLoad("heightmap.bmp", hmInfo);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
+	hm.calculateNormals();
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 
 	light.r = 1;
@@ -407,7 +408,6 @@ void InitD3D(HWND hWnd)
 	devcon->RSSetViewports(1, &viewport);
 
 	//ShowCursor(false);
-	swapchain->SetFullscreenState(true, NULL);
 
 	InitPipeline();
 	InitGraphics();
@@ -428,8 +428,8 @@ void RenderFrame(void)
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
 	devcon->DrawIndexed(hm.getIndices().size(), 0, 0);
-	//if(!modelHandler.getVertices().empty())
-	//	devcon->Draw(modelHandler.getVertices().size(), 0);
+	if(!modelHandler.getVertices().empty())
+		devcon->Draw(modelHandler.getVertices().size(), hm.getIndices().size());
 	swapchain->Present(0, 0);
 }
 
@@ -492,12 +492,15 @@ void InitGraphics()
 	//D3D11_MAPPED_SUBRESOURCE ms;
 	/*devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
 	memcpy(ms.pData, hm.getV().data(), sizeof(Model::Vertex)*hm.getV().size());      
-	devcon->Unmap(pVBuffer, NULL);    */   
+	devcon->Unmap(pVBuffer, NULL);    */
 
-	//D3D11_MAPPED_SUBRESOURCE ms;
-	//devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
-	//memcpy(ms.pData, modelHandler.getVertices().data(), sizeof(Model::Vertex)*modelHandler.getVertices().size());
-	//devcon->Unmap(pVBuffer, NULL);    
+	if (!modelHandler.getVertices().empty())
+	{
+		D3D11_MAPPED_SUBRESOURCE ms;
+		devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+		memcpy(ms.pData, modelHandler.getVertices().data(), sizeof(Model::Vertex)*modelHandler.getVertices().size());
+		devcon->Unmap(pVBuffer, NULL);
+	}
 }
 
 // Loads and prepares the shaders
@@ -507,7 +510,6 @@ void InitPipeline()
 	D3DCompileFromFile(L"Effects.fx", 0, 0, "VShader", "vs_4_0", 0, 0, &VS, 0);
 	D3DCompileFromFile(L"Effects.fx", 0, 0, "PShader", "ps_4_0", 0, 0, &PS, 0);
 	
-
 	dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
 	dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
 

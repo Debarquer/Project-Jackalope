@@ -122,3 +122,21 @@ bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo)
 	return true;
 
 }
+
+void HeightMap::calculateNormals()
+{
+	for (int i = 0; i < v.size()/3; i+=3)
+	{
+		int a = indices[i];
+		int b = indices[i + 1];
+		int c = indices[i + 2];
+
+		XMFLOAT3 normal = Model::cross(
+			XMFLOAT3{ v[b].pX - v[a].pX, v[b].pY - v[a].pY, v[b].pZ - v[a].pZ },
+			XMFLOAT3{ v[c].pX - v[a].pX, v[c].pY - v[a].pY, v[c].pZ - v[a].pZ });
+
+		v[a].nX = v[b].nX = v[c].nX = normal.x;
+		v[a].nY = v[b].nY = v[c].nY = normal.y;
+		v[a].nZ = v[b].nZ = v[c].nZ = normal.z;
+	}
+}

@@ -29,7 +29,7 @@ public:
 	~Model();
 
 	void LoadModel(Model& other);
-	DirectX::XMFLOAT3 cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2);
+	static DirectX::XMFLOAT3 cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2);
 	static Model LoadTextFile(std::string filename, bool &failed);
 };
 
