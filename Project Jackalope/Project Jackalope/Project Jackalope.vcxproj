@@ -181,6 +181,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="heightmap.bmp" />
+    <Image Include="Map.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Stormtrooper.obj">
