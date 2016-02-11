@@ -68,6 +68,26 @@ void Player::yaw(float direction, double dt)
 	lookAt = XMVector3TransformNormal(lookAt, R);
 }
 
+void Player::update()
+{
+	XMVECTOR R = camRight;
+	XMVECTOR U = camUp;
+	XMVECTOR L = lookAt;
+	XMVECTOR P = camera;
+
+	L = XMVector3Normalize(L);
+	U = XMVector3Normalize(XMVector3Cross(L, R));
+	R = XMVector3Cross(U, L);
+	float x = -XMVectorGetX(XMVector3Dot(P, R));
+	float y = -XMVectorGetX(XMVector3Dot(P, U));
+	float z = -XMVectorGetX(XMVector3Dot(P, L));
+	
+	camRight = R;
+	camUp = U;
+	lookAt = L;
+
+}
+
 void Player::jump(double dt)
 {
 	if (isAirborne)
