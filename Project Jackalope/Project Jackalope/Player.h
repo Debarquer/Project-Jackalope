@@ -38,7 +38,7 @@ public:
 	void strafe(XMVECTOR movement, double dt);
 	void pitch(float direction, double dt);
 	void yaw(float direction, double dt);
-
+	void update();
 	void jump(double dt);
 
 	Player();

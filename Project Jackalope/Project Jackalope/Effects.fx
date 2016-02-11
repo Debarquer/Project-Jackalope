@@ -20,8 +20,9 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR, float3 normal : N
     VOut output;
 
 	float4 testPos = mul(world, position);
+	normal = mul(world, normal);
 
-	output.color = /*float4(1.0, 0.0, 0.0, 1.0);*/float4(testPos.y/26, testPos.y/26, testPos.y/26, 1.0);
+	output.color = float4(1.0, 0.0, 0.0, 1.0);
     output.position = mul(worldViewProj, position);
 	output.uv = uv;
 
@@ -35,5 +36,5 @@ float4 PShader(float4 position : SV_POSITION, float4 color : COLOR, float3 norma
 	float3 norLightPos = normalize(float3(0.0, 100.0, 0.0) - position);
 	float angle = max(dot(norLightPos, norNormal), 0.0);
 
-	return color;
+	return color*angle*float4(lightColor, 1.0) + color*0.5;
 }

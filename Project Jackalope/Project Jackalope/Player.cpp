@@ -35,11 +35,14 @@ Player::~Player()
 
 void Player::move(XMVECTOR movement, double dt)
 {
-	DirectX::XMVECTOR s = movement;
+	DirectX::XMVECTOR s = XMVectorReplicate(1.0);
 	DirectX::XMVECTOR l = lookAt;
 	DirectX::XMVECTOR p = camera;
 
-	camera = DirectX::XMVectorMultiplyAdd(s, l, p);
+	DirectX::XMVECTOR sl = s*l;
+	DirectX::XMVECTOR p2 = p + sl;
+	p = p2;
+	//camera = DirectX::XMVectorMultiplyAdd(s, l, p);
 	//lookAt = DirectX::XMVectorMultiplyAdd(s, l, l);
 
 	view = DirectX::XMMatrixLookToLH(camera, lookAt, camUp);
@@ -47,11 +50,17 @@ void Player::move(XMVECTOR movement, double dt)
 
 void Player::strafe(XMVECTOR movement, double dt)
 {
-	DirectX::XMVECTOR s = movement;
+	DirectX::XMVECTOR s = XMVectorReplicate(1.0);
 	DirectX::XMVECTOR r = camRight;
 	DirectX::XMVECTOR p = camera;
 
-	camera = DirectX::XMVectorMultiplyAdd(s, r, p);
+	DirectX::XMVECTOR sr = s*r;
+	DirectX::XMVECTOR p2 = p + sr;
+	p = p2;
+
+	//camera = DirectX::XMVectorMultiplyAdd(s, r, p);
+
+	view = DirectX::XMMatrixLookToLH(camera, lookAt, camUp);
 }
 
 void Player::pitch(float direction, double dt)
@@ -86,6 +95,7 @@ void Player::update()
 	camUp = U;
 	lookAt = L;
 
+	view = XMMatrixLookToLH(camera, lookAt, camUp);
 }
 
 void Player::jump(double dt)

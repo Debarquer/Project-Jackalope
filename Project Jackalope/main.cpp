@@ -93,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	bool failed;
 	//modelHandler.addModel(Model::LoadTextFile("untitled.obj", failed));
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
-	hm.HeightMapLoad("Map.bmp", hmInfo);
+	hm.HeightMapLoad("heightmap.bmp", hmInfo);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
 	hm.calculateNormals();
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
@@ -134,8 +134,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			player.move(movement, dt);
 			player.strafe(movement, dt);
+
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
-			//player.update(dt);
+			player.update();
 
 			POINT p;
 			GetCursorPos(&p);
@@ -248,7 +249,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 void CreateConstantBuffer()
 {
-	XMMATRIX world = XMMatrixRotationY(0);
+	XMMATRIX world = XMMatrixRotationX(angle);
 	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(90), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
 	XMMATRIX worldViewProj = world * player.view * proj;
