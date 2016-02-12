@@ -6,7 +6,7 @@ Player::Player()
 	currentSpeed = DirectX::SimpleMath::Vector3( 0, 0, 0 );
 	maxSpeed = DirectX::SimpleMath::Vector3( 100, 1500, 100 );
 
-	camera = DirectX::XMVectorSet( 0.0f, 250.0f, -2.0f, 0.0f);
+	camera = DirectX::XMVectorSet( 0.0f, 50.0f, 0.0f, 0.0f);
 	lookAt = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
 	DefaultFoward = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
@@ -38,12 +38,7 @@ void Player::move(float d)
 	DirectX::XMVECTOR s = XMVectorReplicate(d);
 	DirectX::XMVECTOR l = lookAt;
 	DirectX::XMVECTOR p = camera;
-
-	//DirectX::XMVECTOR sl = s*l;
-	//DirectX::XMVECTOR p2 = p + sl;
-	//p = p2;
 	camera = DirectX::XMVectorMultiplyAdd(s, l, p);
-	//lookAt = DirectX::XMVectorMultiplyAdd(s, l, l);
 
 	view = DirectX::XMMatrixLookToLH(camera, lookAt, camUp);
 }
@@ -52,11 +47,6 @@ void Player::strafe(float d)
 	DirectX::XMVECTOR s = XMVectorReplicate(d);
 	DirectX::XMVECTOR r = camRight;
 	DirectX::XMVECTOR p = camera;
-
-	//DirectX::XMVECTOR sr = s*r;
-	//DirectX::XMVECTOR p2 = p + sr;
-	//p = p2;
-
 	camera = DirectX::XMVectorMultiplyAdd(s, r, p);
 
 	view = DirectX::XMMatrixLookToLH(camera, lookAt, camUp);

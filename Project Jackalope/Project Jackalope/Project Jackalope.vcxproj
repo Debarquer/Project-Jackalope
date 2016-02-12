@@ -148,6 +148,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelHandler.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="WICTextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Functions.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelHandler.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="WICTextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Effects.fx">

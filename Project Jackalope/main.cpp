@@ -23,8 +23,8 @@ Light light;
 Player player;
 double dt;
 
-#define SCREEN_WIDTH  800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH  1366
+#define SCREEN_HEIGHT 768
 
 //movement booleans
 bool upIsPressed = false, downIsPressed = false, leftIsPressed = false, rightIsPressed = false;
@@ -39,6 +39,7 @@ ID3D11InputLayout *pLayout = nullptr;
 ID3D11VertexShader *pVS = nullptr;
 ID3D11PixelShader *pPS = nullptr;
 ID3D11Buffer *pVBuffer = nullptr;
+ID3D11Buffer *pVBuffer2 = nullptr;
 ID3D11Buffer *pIBuffer = nullptr;
 ID3D11Buffer* gConstantBuffer = nullptr;
 ID3D11DepthStencilView* depthStencilView;
@@ -91,7 +92,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowWindow(hWnd, nCmdShow);
 
 	bool failed;
-	//modelHandler.addModel(Model::LoadTextFile("untitled.obj", failed));
+	//modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev, devcon));
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
 	hm.HeightMapLoad("heightmap.bmp", hmInfo);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
@@ -103,7 +104,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	light.b = 1;
 	light.position.x = 100;
 	light.position.z = 100;
-	light.position.y = 1000;
+	light.position.y = 200;
 
 	InitD3D(hWnd);
 
@@ -134,8 +135,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			if (movement.x != 0 || movement.y != 0 || movement.z != 0)
 			{
-				player.move(movement.z*dt*500);
-				player.strafe(movement.x*dt*500);
+				player.move(movement.z*dt*250);
+				player.strafe(movement.x*dt*250);
 			}
 
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
@@ -198,18 +199,26 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		switch (wParam)
 		{
 		case VK_UP:
+			light.position.z += 10;
+			break;
 		case 0x57:
 			upIsPressed = true;
 			break;
 		case VK_DOWN:
+			light.position.z -= 10;
+			break;
 		case 0x53:
 			downIsPressed = true;
 			break;
 		case VK_RIGHT:
+			light.position.x += 10;
+			break;
 		case 0x44:
 			rightIsPressed = true;
 			break;
 		case VK_LEFT:
+			light.position.x -= 10;
+			break;
 		case 0x41:
 			leftIsPressed = true;
 			break;
@@ -223,22 +232,18 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	{
 		switch (wParam)
 		{
-		case VK_UP:
 		case 0x57:
 			upIsPressed = false;
 			movement.z = 0;
 			break;
-		case VK_DOWN:
 		case 0x53:	
 			downIsPressed = false;
 			movement.z = 0;
 			break;
-		case VK_RIGHT:
 		case 0x44:
 			rightIsPressed = false;
 			movement.x = 0;
 			break;
-		case VK_LEFT:
 		case 0x41:
 			leftIsPressed = false;
 			movement.x = 0;
@@ -254,7 +259,7 @@ void CreateConstantBuffer()
 {
 	XMMATRIX world = XMMatrixRotationX(0);
 	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(90), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
 	XMMATRIX worldViewProj = world * player.view * proj;
 	
 	struct VS_CONSTANT_BUFFER
@@ -425,15 +430,22 @@ void RenderFrame(void)
 	devcon->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffer);
 
-	// select which vertex buffer to display
+	//select heightmap buffer
 	UINT stride = sizeof(Model::Vertex);
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
 	devcon->DrawIndexed(hm.getIndices().size(), 0, 0);
+
+	//select model buffer
+	stride = sizeof(Model::Vertex);
+	offset = 0;
+	devcon->IASetVertexBuffers(0, 1, &pVBuffer2, &stride, &offset);
+	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	if(!modelHandler.getVertices().empty())
-		devcon->Draw(modelHandler.getVertices().size(), hm.getIndices().size());
+		devcon->Draw(modelHandler.getVertices().size(), 0);
 	swapchain->Present(0, 0);
 }
 
@@ -492,18 +504,29 @@ void InitGraphics()
 	vertexBufferData.SysMemSlicePitch = 0;
 	HRESULT hr = dev->CreateBuffer(&bd, &vertexBufferData, &pVBuffer);
 
-	// copy the vertices into the buffer
-	//D3D11_MAPPED_SUBRESOURCE ms;
-	/*devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
-	memcpy(ms.pData, hm.getV().data(), sizeof(Model::Vertex)*hm.getV().size());      
-	devcon->Unmap(pVBuffer, NULL);    */
+	D3D11_BUFFER_DESC bd2;
+	ZeroMemory(&bd2, sizeof(bd2));
+
+	bd2.Usage = D3D11_USAGE_DYNAMIC;
+	bd2.ByteWidth = sizeof(Model::Vertex)*modelHandler.getVertices().size();
+	bd2.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd2.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bd2.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData2;
+	ZeroMemory(&vertexBufferData2, sizeof(vertexBufferData2));
+
+	vertexBufferData2.pSysMem = modelHandler.getVertices().data();
+	vertexBufferData2.SysMemPitch = 0;
+	vertexBufferData2.SysMemSlicePitch = 0;
+	hr = dev->CreateBuffer(&bd2, &vertexBufferData2, &pVBuffer2);
 
 	if (!modelHandler.getVertices().empty())
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
-		devcon->Map(pVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+		HRESULT HArgh = devcon->Map(pVBuffer2, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
 		memcpy(ms.pData, modelHandler.getVertices().data(), sizeof(Model::Vertex)*modelHandler.getVertices().size());
-		devcon->Unmap(pVBuffer, NULL);
+		devcon->Unmap(pVBuffer2, NULL);
 	}
 }
 

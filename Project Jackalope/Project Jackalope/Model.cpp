@@ -1,5 +1,5 @@
 #include "Model.h"
-//#include "WICTextureLoader.h"
+#include "WICTextureLoader.h"
 
 Model::Model()
 {
@@ -16,6 +16,7 @@ Model::~Model()
 {
 }
 
+//**DEPRECATED?**
 void Model::LoadModel(Model& other)
 {
 	this->material = other.material;
@@ -33,7 +34,7 @@ DirectX::XMFLOAT3 Model::cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2)
 	return output;
 }
 
-Model Model::LoadTextFile(std::string filename, bool &failed)
+Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev, ID3D11DeviceContext* devcon)
 {
 	bool hadMaterialFile, hadMaterial;
 	failed = false;
@@ -144,22 +145,22 @@ Model Model::LoadTextFile(std::string filename, bool &failed)
 	}
 	else
 	{
-		std::string fileName;
-		for (int i = 0; model.materialFile[i] != '.'; i++)
-		{
-			filename += model.materialFile[i];
-		}
+		std::string fileName = "";
+		filename = model.materialFile.substr(0, model.materialFile.size() - 4);
 		filename += ".png";
 
 		wchar_t* wide_string = new wchar_t[filename.length() + 1];
 		std::copy(filename.begin(), filename.end(), wide_string);
 		wide_string[filename.length()] = 0;
 
+		//CoCreateInstance()
+
 		ID3D11Texture2D* texture = NULL;
 		ID3D11Resource* texRes = NULL;
 		ID3D11ShaderResourceView* texView = NULL;
 
-		//DirectX::CreateWICTextureFromFile(dev, devcon, wide_string, &texRes, &texView, (size_t)0Ui64);
+		HRESULT harr = DirectX::CreateWICTextureFromFile(dev, devcon, wide_string, &texRes, &texView, (size_t)0Ui64);
+		bool boll = true;
 	}
 
 	fclose(file);

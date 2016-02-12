@@ -125,18 +125,38 @@ bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo)
 
 void HeightMap::calculateNormals()
 {
-	for (int i = 0; i < v.size()/3; i+=3)
+	for (int i = 0; i < indices.size(); i+=3)
 	{
 		int a = indices[i];
 		int b = indices[i + 1];
 		int c = indices[i + 2];
 
-		XMFLOAT3 normal = Model::cross(
-			XMFLOAT3{ v[b].pX - v[a].pX, v[b].pY - v[a].pY, v[b].pZ - v[a].pZ },
-			XMFLOAT3{ v[c].pX - v[a].pX, v[c].pY - v[a].pY, v[c].pZ - v[a].pZ });
+		XMVECTOR xnormal = XMVector3Cross(
+			XMVectorSet(v[c].pX - v[a].pX, v[c].pY - v[a].pY, v[c].pZ - v[a].pZ, 1.0),
+			XMVectorSet(v[b].pX - v[a].pX, v[b].pY - v[a].pY, v[b].pZ - v[a].pZ, 1.0));
+
+		xnormal = XMVector3Normalize(xnormal);
+		XMFLOAT3 normal;
+		XMStoreFloat3(&normal, xnormal);
 
 		v[a].nX = v[b].nX = v[c].nX = normal.x;
+		float lengtha = sqrt(v[a].pX*v[a].pX + v[a].pY*v[a].pY + v[a].pZ*v[a].pZ);
 		v[a].nY = v[b].nY = v[c].nY = normal.y;
+		float lengthb = sqrt(v[b].pX*v[b].pX + v[b].pY*v[b].pY + v[b].pZ*v[b].pZ);
 		v[a].nZ = v[b].nZ = v[c].nZ = normal.z;
+		float lengthc = sqrt(v[c].pX*v[c].pX + v[c].pY*v[c].pY + v[c].pZ*v[c].pZ);
+
+		v[a].nX /= lengtha;
+		v[a].nY /= lengtha;
+		v[a].nZ /= lengtha;
+
+		v[b].nX /= lengthb;
+		v[b].nY /= lengthb;
+		v[b].nZ /= lengthb;
+
+		v[c].nX /= lengthc;
+		v[c].nY /= lengthc;
+		v[c].nZ /= lengthc;
 	}
+	
 }

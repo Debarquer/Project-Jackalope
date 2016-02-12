@@ -1,7 +1,7 @@
 Core
 	Deferred rendering (KJS)
 Geometry
-	Parsing rendering an exising model format (S)
+	Parsing rendering an existing model format (S)
 	Height-map (K)
 Texture and lighting
 	Normal mapping (J)
