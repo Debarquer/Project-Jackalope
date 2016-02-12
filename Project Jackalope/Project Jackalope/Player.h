@@ -34,8 +34,8 @@ public:
 	XMMATRIX view;
 	XMMATRIX camRotationMatrix;
 	
-	void move(XMVECTOR movement, double dt);
-	void strafe(XMVECTOR movement, double dt);
+	void move(float d);
+	void strafe(float d);
 	void pitch(float direction, double dt);
 	void yaw(float direction, double dt);
 	void update();

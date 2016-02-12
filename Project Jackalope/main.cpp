@@ -132,8 +132,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			if (leftIsPressed)
 				movement += DirectX::SimpleMath::Vector3(-1, 0, 0);
 
-			player.move(movement, dt);
-			player.strafe(movement, dt);
+			if (movement.x != 0 || movement.y != 0 || movement.z != 0)
+			{
+				player.move(movement.z*dt*500);
+				player.strafe(movement.x*dt*500);
+			}
 
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
 			player.update();
@@ -249,7 +252,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 void CreateConstantBuffer()
 {
-	XMMATRIX world = XMMatrixRotationX(angle);
+	XMMATRIX world = XMMatrixRotationX(0);
 	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(90), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
 	XMMATRIX worldViewProj = world * player.view * proj;
