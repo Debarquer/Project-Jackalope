@@ -15,6 +15,9 @@ cbuffer VS_CONSTANT_BUFFER : register(b0)
 	float3 lightPosition;
 };
 
+Texture2D tex : register(t0);
+SamplerState sampAni;
+
 // *** Vertex shader ***
 VOut VShader(float4 position : POSITION, float4 color : COLOR, float3 normal : NORMAL, float2 uv : TEXCOORD)
 {
@@ -35,9 +38,11 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR, float3 normal : N
 // *** Pixel shader ***
 float4 PShader(float4 position : SV_POSITION, float4 wposition : WPOSITION, float4 color : COLOR, float3 normal : NORMAL, float2 uv : TEXCOORD) : SV_TARGET
 {
+	float4 s = tex.Sample(sampAni, uv);
+
 	float3 norNormal = normalize(normal);
 	float3 norLightPos = normalize(lightPosition - wposition);
 	float angle = max(dot(norLightPos, norNormal), 0.0);
 
-	return color*angle+color*0.01;
+	return s*angle + s*0.1;//color*angle + color*0.01;
 }

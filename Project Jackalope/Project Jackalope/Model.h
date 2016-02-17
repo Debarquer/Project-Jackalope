@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include "SimpleMath.h"
+#include "WICTextureLoader.h"
+
 
 //using namespace DirectX::SimpleMath;
 
@@ -23,7 +25,7 @@ public:
 	std::string materialFile;
 	std::string material;
 	std::vector<Vertex> mVertices;
-	ID3D11Texture2D* texture;
+	ID3D11ShaderResourceView* pSRV;
 
 	Model();
 	~Model();

@@ -91,13 +91,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	ShowWindow(hWnd, nCmdShow);
 
+	InitD3D(hWnd);
+
 	bool failed;
-	//modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev, devcon));
+	modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev, devcon));
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
-	hm.HeightMapLoad("heightmap.bmp", hmInfo);
+	hm.HeightMapLoad("heightmap.bmp", hmInfo, dev);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
 	hm.calculateNormals();
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
+
+	InitGraphics();
 
 	light.r = 1;
 	light.g = 1;
@@ -105,8 +109,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	light.position.x = 100;
 	light.position.z = 100;
 	light.position.y = 200;
-
-	InitD3D(hWnd);
 
 	MSG msg = { 0 };
 	
@@ -135,8 +137,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			if (movement.x != 0 || movement.y != 0 || movement.z != 0)
 			{
-				player.move(movement.z*dt*250);
-				player.strafe(movement.x*dt*250);
+				player.move(movement.z*dt*25);
+				player.strafe(movement.x*dt*25);
 			}
 
 			movement = DirectX::SimpleMath::Vector3(0, 0, 0);
@@ -419,7 +421,6 @@ void InitD3D(HWND hWnd)
 	//ShowCursor(false);
 
 	InitPipeline();
-	InitGraphics();
 }
 
 // Render single frame
@@ -436,13 +437,17 @@ void RenderFrame(void)
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
+	devcon->PSSetShaderResources(0, 1, &hm.pSRV);
+
 	devcon->DrawIndexed(hm.getIndices().size(), 0, 0);
 
 	//select model buffer
 	stride = sizeof(Model::Vertex);
 	offset = 0;
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer2, &stride, &offset);
-	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	devcon->PSSetShaderResources(0, 1, &modelHandler.getModels()[0].pSRV);
 
 	if(!modelHandler.getVertices().empty())
 		devcon->Draw(modelHandler.getVertices().size(), 0);

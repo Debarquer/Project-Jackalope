@@ -64,7 +64,7 @@ void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex>& v
 		}
 }
 
-bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo)
+bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo, ID3D11Device* dev)
 {
 	FILE *fileptr;
 
@@ -119,6 +119,7 @@ bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo)
 	}
 	delete[] bitmapImage;
 	bitmapImage = 0;
+	HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grass.png", nullptr, &pSRV);
 	return true;
 
 }

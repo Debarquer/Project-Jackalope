@@ -1,9 +1,8 @@
 #include "Model.h"
-#include "WICTextureLoader.h"
 
 Model::Model()
 {
-	texture = nullptr;
+	pSRV = nullptr;
 }
 
 //Model::Model(Model& other)
@@ -153,14 +152,8 @@ Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev,
 		std::copy(filename.begin(), filename.end(), wide_string);
 		wide_string[filename.length()] = 0;
 
-		//CoCreateInstance()
-
-		ID3D11Texture2D* texture = NULL;
-		ID3D11Resource* texRes = NULL;
-		ID3D11ShaderResourceView* texView = NULL;
-
-		HRESULT harr = DirectX::CreateWICTextureFromFile(dev, devcon, wide_string, &texRes, &texView, (size_t)0Ui64);
-		bool boll = true;
+		HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"test.png", nullptr, &model.pSRV);
+		
 	}
 
 	fclose(file);
