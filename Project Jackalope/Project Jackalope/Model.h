@@ -19,7 +19,7 @@ public:
 	struct Vertex
 	{
 		float pX, pY, pZ, r, g, b, w,
-			nX, nY, nZ, u, v;
+			nX, nY, nZ, u, v, tX, tY, tZ;
 	};
 
 	std::string materialFile;
