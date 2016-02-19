@@ -14,7 +14,9 @@ public:
 	int NumFaces;
 	int cols;
 	int rows;
+	int texUindex, texVindex;
 	ID3D11ShaderResourceView* pSRV;
+	ID3D11ShaderResourceView* bmpMapView;
 
 	struct HeightMapInfo {
 		int terrainWidth;
@@ -30,4 +32,5 @@ public:
 	void CreateGrid(HeightMapInfo &hminfo, std::vector <Model::Vertex>& v, std::vector <DWORD>& indices);
 	bool HeightMapLoad(char* filename, HeightMapInfo &hminfo, ID3D11Device* dev);
 	void calculateNormals();
+	void CalcTangent();
 };

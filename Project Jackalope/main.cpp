@@ -438,7 +438,10 @@ void RenderFrame(void)
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
-	devcon->PSSetShaderResources(0, 1, &hm.pSRV);
+	ID3D11ShaderResourceView* shaders1[2];
+	shaders1[0] = hm.pSRV;
+	shaders1[1] = hm.bmpMapView;
+	devcon->PSSetShaderResources(0, 2, shaders1);
 
 	devcon->DrawIndexed(hm.getIndices().size(), 0, 0);
 
@@ -448,7 +451,7 @@ void RenderFrame(void)
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer2, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	devcon->PSSetShaderResources(0, 1, &modelHandler.getModels()[0].pSRV);
+	//devcon->PSSetShaderResources(0, 1, &modelHandler.getModels()[0].pSRV);
 
 	if(!modelHandler.getVertices().empty())
 		devcon->Draw(modelHandler.getVertices().size(), 0);

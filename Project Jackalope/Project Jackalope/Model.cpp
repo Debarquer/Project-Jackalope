@@ -155,44 +155,6 @@ Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev,
 		HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grass.png", nullptr, &model.pSRV);
 	}
 
-	ID3D11ShaderResourceView* bmpMapView;
-	HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grassNormal.png", nullptr, &bmpMapView);
-	for (int i = 0; i < model.mVertices.size(); i+=3)
-	{
-		//float u0 = model.mVertices[i].u;
-		//float v0 = model.mVertices[i].v;
-		//float u1 = model.mVertices[i+1].u;
-		//float v1 = model.mVertices[i+1].v;
-
-		//DirectX::XMFLOAT3X3 uvMatrix = DirectX::XMFLOAT3X3( u0, v0, 0.0f, u1, v1, 0.0f, 0.0f, 0.0f, 0.0f );
-		//DirectX::XMFLOAT3X3 eMatrix;
-		
-		float vecX = model.mVertices[i].pX - model.mVertices[i + 2].pX;
-		float vecY = model.mVertices[i].pY - model.mVertices[i + 2].pY;
-		float vecZ = model.mVertices[i].pZ - model.mVertices[i + 2].pZ;
-		DirectX::XMVECTOR e1 = DirectX::XMVectorSet(vecX, vecY, vecZ, 0.0f);
-
-		vecX = model.mVertices[i + 2].pX - model.mVertices[i + 1].pX;
-		vecY = model.mVertices[i + 2].pY - model.mVertices[i + 1].pY;
-		vecZ = model.mVertices[i + 2].pZ - model.mVertices[i + 1].pZ;
-		DirectX::XMVECTOR e2 = DirectX::XMVectorSet(vecX, vecY, vecZ, 0.0f);
-
-		DirectX::XMVECTOR tangent;
-
-		float uvU = model.mVertices[i].u - model.mVertices[i + 2].u;
-		float uvV = model.mVertices[i].v - model.mVertices[i + 2].v;
-		DirectX::XMVECTOR dUV1 = DirectX::XMVectorSet(uvU, uvV, 0.0f, 0.0f);
-
-		uvU = model.mVertices[i + 2].u - model.mVertices[i + 1].u;
-		uvV = model.mVertices[i + 2].v - model.mVertices[i + 1].v;
-		DirectX::XMVECTOR dUV2 = DirectX::XMVectorSet(uvU, uvV, 0.0f, 0.0f);
-
-		float tanX = DirectX::XMVectorScale(dUV1, DirectX::XMVectorGetX(e1));
-
-		//DirectX::XMVECTOR T = DirectX::XMVectorGetX(dUV1)
-	}
-
-
 	fclose(file);
 	return model;
 }
