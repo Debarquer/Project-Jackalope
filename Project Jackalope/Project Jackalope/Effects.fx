@@ -38,7 +38,7 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR, float3 normal : N
 }
 
 // *** Pixel shader ***
-float4 PShader(float4 position : SV_POSITION, float4 wposition : WPOSITION, float4 color : COLOR, float3 normal : NORMAL, float2 uv : TEXCOORD) : SV_TARGET
+float4 PShader(float4 position : SV_POSITION, float4 wposition : WPOSITION, float4 color : COLOR, float3 normal : NORMAL, float2 uv : TEXCOORD, float3 tangent : TANGENT) : SV_TARGET
 {
 	float4 s = tex.Sample(sampAni, uv);
 	float4 nCol = normalMap.Sample(sampAni, uv);

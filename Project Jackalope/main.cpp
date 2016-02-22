@@ -46,6 +46,7 @@ ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer = nullptr;
 ID3D11RasterizerState* rasterState = nullptr;
 ID3D11DepthStencilState* depthStencilState = nullptr;
+ID3D11SamplerState* pSamplerState = nullptr;
 
 float angle = 0.0f;
 
@@ -94,13 +95,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	InitD3D(hWnd);
 
 	bool failed;
-	modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev, devcon));
+	//modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev, devcon));
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
 	hm.HeightMapLoad("heightmap.bmp", hmInfo, dev);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
 	hm.calculateNormals();
+	//hm.CalcTangent();
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
-
+	CreateSampler();
 	InitGraphics();
 
 	light.r = 1;
@@ -151,19 +153,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			//the SCREEN_HEIGHT and SCREEN_WIDTH are hardcoded, and
 			//only represent the window size, which currently is smaller
 			//than the entire screen, producing suboptimal results.
-			if (p.y > SCREEN_HEIGHT - (SCREEN_HEIGHT / 100))
+			if (p.y > SCREEN_HEIGHT - (SCREEN_HEIGHT / 10))
 			{
 				player.pitch(1, dt);
 			}
-			else if (p.y < (SCREEN_HEIGHT / 100))
+			else if (p.y < (SCREEN_HEIGHT / 10))
 			{
 				player.pitch(-1, dt);
 			}
-			if (p.x > SCREEN_WIDTH - (SCREEN_WIDTH / 100))
+			if (p.x > SCREEN_WIDTH - (SCREEN_WIDTH / 10))
 			{
 				player.yaw(1, dt);
 			}
-			else if (p.x < (SCREEN_WIDTH / 100))
+			else if (p.x < (SCREEN_WIDTH / 10))
 			{
 				player.yaw(-1, dt);
 			}
@@ -537,6 +539,8 @@ void InitGraphics()
 		memcpy(ms.pData, modelHandler.getVertices().data(), sizeof(Model::Vertex)*modelHandler.getVertices().size());
 		devcon->Unmap(pVBuffer2, NULL);
 	}
+
+	devcon->PSSetSamplers(0, 1, &pSamplerState);
 }
 
 // Loads and prepares the shaders
@@ -558,9 +562,29 @@ void InitPipeline()
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 52, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	
 	dev->CreateInputLayout(ied, 5, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
 	devcon->IASetInputLayout(pLayout);
+}
+
+void CreateSampler()
+{
+  D3D11_SAMPLER_DESC sampler;
+  sampler.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+  sampler.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler.MipLODBias = 0;
+  sampler.MaxAnisotropy = 1;
+  sampler.ComparisonFunc = D3D11_COMPARISON_NEVER;
+  sampler.BorderColor[0] = 1.0;
+  sampler.BorderColor[1] = 1.0;
+  sampler.BorderColor[2] = 1.0;
+  sampler.BorderColor[3] = 1.0;
+  sampler.MinLOD = -FLT_MAX;
+  sampler.MaxLOD = FLT_MAX;
+
+  dev->CreateSamplerState(&sampler, &pSamplerState);
 }

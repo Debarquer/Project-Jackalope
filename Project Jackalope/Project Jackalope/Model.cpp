@@ -151,7 +151,7 @@ Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev,
 		wchar_t* wide_string = new wchar_t[filename.length() + 1];
 		std::copy(filename.begin(), filename.end(), wide_string);
 		wide_string[filename.length()] = 0;
-
+		
 		HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grass.png", nullptr, &model.pSRV);
 	}
 

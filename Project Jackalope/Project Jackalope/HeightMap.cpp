@@ -43,7 +43,6 @@ void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex>& v
 				v.push_back(vertex);
 				hminfo.numVertices++;
 			}
-		
 		}
 			// Creating index list
 			for (DWORD i = 0; i < rows - 1; i++)
@@ -74,10 +73,10 @@ void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex>& v
 					indices.push_back((i + 1)*cols + j + 1);
 					v[(i + 1)*cols + j + 1].u = texUindex + 1.0f;
 					v[(i + 1)*cols + j + 1].v = texVindex + 1.0f;
-					texUindex++;
+					texUindex ++;
 			}
 				texUindex = 0;
-				texVindex++;
+				texVindex ++;
 		}
 }
 
@@ -127,17 +126,17 @@ bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo, ID3D11Dev
 
 			height = bitmapImage[l];
 			index = (hminfo.terrainHeight * j) + i;
-			hminfo.heightMap[index].x = (float)i;
-			hminfo.heightMap[index].y = (float)height / heightFactor;
-			hminfo.heightMap[index].z = (float)j;
-			l += 3;
+			hminfo.heightMap[index].x = (float) i;
+			hminfo.heightMap[index].y = (float)height/heightFactor;
+			hminfo.heightMap[index].z = (float) j;
+			l += 3; 
 		}
 
 	}
 	delete[] bitmapImage;
 	bitmapImage = 0;
-	HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grass.png", nullptr, &pSRV);
-	HRESULT hr2 = DirectX::CreateWICTextureFromFile(dev, L"grassNormal.png", nullptr, &bmpMapView);
+	HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grass.jpg", nullptr, &pSRV);
+	//HRESULT hr2 = DirectX::CreateWICTextureFromFile(dev, L"grassNormal.png", nullptr, &bmpMapView);
 	return true;
 
 }
@@ -186,7 +185,7 @@ void HeightMap::CalcTangent()
 	XMFLOAT3 unnormalized = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	std::vector<XMFLOAT3> tempTangent;
 	XMFLOAT3 tangent = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	
+
 	float vecX, vecY, vecZ;
 	
 	XMVECTOR edge1 = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -195,7 +194,7 @@ void HeightMap::CalcTangent()
 	{
 		vecX = v[indices[i * 3]].pX - v[indices[(i * 3) + 2]].pX;
 		vecY = v[indices[i * 3]].pY - v[indices[(i * 3) + 2]].pY;
-		vecY = v[indices[i * 3]].pZ - v[indices[(i * 3) + 2]].pZ;
+		vecZ = v[indices[i * 3]].pZ - v[indices[(i * 3) + 2]].pZ;
 		edge1 = XMVectorSet(vecX, vecY, vecZ, 0.0f);
 
 		vecX = v[indices[(i * 3) + 2]].pX - v[indices[(i * 3) + 1]].pX;
