@@ -23,8 +23,8 @@ Light light;
 Player player;
 double dt;
 
-#define SCREEN_WIDTH  1366
-#define SCREEN_HEIGHT 768
+#define SCREEN_WIDTH  1920
+#define SCREEN_HEIGHT 1080
 
 //movement booleans
 bool upIsPressed = false, downIsPressed = false, leftIsPressed = false, rightIsPressed = false;
@@ -41,7 +41,9 @@ ID3D11PixelShader *pPS = nullptr;
 ID3D11Buffer *pVBuffer = nullptr;
 ID3D11Buffer *pVBuffer2 = nullptr;
 ID3D11Buffer *pIBuffer = nullptr;
-ID3D11Buffer* gConstantBuffer = nullptr;
+ID3D11Buffer** gConstantBuffers = new ID3D11Buffer[2];
+gConstantBuffers[0] = nullptr;
+gConstantBuffers[1] = nullptr;
 ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer = nullptr;
 ID3D11RasterizerState* rasterState = nullptr;
@@ -93,6 +95,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	InitD3D(hWnd);
 
+	//Load models
 	bool failed;
 	modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev, devcon));
 	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
@@ -168,9 +171,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				player.yaw(-1, dt);
 			}
 
-			CreateConstantBuffer();
+			CreateConstantBufferForP1();
 			RenderFrame();
-			gConstantBuffer->Release();
+			gConstantBuffers[0]->Release();
+			gConstantBuffers[1]->Release();
 
 			clock_t diffTime = clock() - prevTime;
 			dt = (float)(diffTime) / CLOCKS_PER_SEC;
@@ -257,44 +261,124 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-void CreateConstantBuffer()
+void CreateConstantBufferForP1()
 {
 	XMMATRIX world = XMMatrixRotationX(0);
 	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
 	XMMATRIX worldViewProj = world * player.view * proj;
 	
-	struct VS_CONSTANT_BUFFER
+	struct VS_TRANSFORMS_BUFFER
 	{
 		XMMATRIX worldViewProj;
 		XMMATRIX world;
-		XMFLOAT3 lightColor;
-		XMFLOAT3 lightPosition;
-		BOOL hasNormalMap;
 	};
 
-	VS_CONSTANT_BUFFER VsConstData;
-	VsConstData.worldViewProj = worldViewProj;
-	VsConstData.world = world;
-	VsConstData.lightColor = XMFLOAT3{ light.r, light.g, light.b };
-	VsConstData.lightPosition = light.position;
+	VS_TRANSFORMS_BUFFER TransformsData;
+	TransformsData.worldViewProj = worldViewProj;
+	TransformsData.world = world;
 
-	D3D11_BUFFER_DESC cbDesc;
-	cbDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER);
-	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cbDesc.MiscFlags = 0;
-	cbDesc.StructureByteStride = 0;
+	D3D11_BUFFER_DESC cbTDesc;
+	cbTDesc.ByteWidth = sizeof(VS_TRANSFORMS_BUFFER);
+	cbTDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbTDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbTDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbTDesc.MiscFlags = 0;
+	cbTDesc.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA InitData;
-	InitData.pSysMem = &VsConstData;
-	InitData.SysMemPitch = 0;
-	InitData.SysMemSlicePitch = 0;
-	dev->CreateBuffer(&cbDesc, &InitData, &gConstantBuffer);
+	D3D11_SUBRESOURCE_DATA InitTransformData;
+	InitTransformData.pSysMem = &TransformsData;
+	InitTransformData.SysMemPitch = 0;
+	InitTransformData.SysMemSlicePitch = 0;
+	dev->CreateBuffer(&cbTDesc, &InitTransformData, &gConstantBuffers[0]);
 
-	angle += + 1 * dt;
-	devcon->UpdateSubresource(gConstantBuffer, 0, 0, &VsConstData, 0, 0);
+	devcon->UpdateSubresource(gConstantBuffers[0], 0, 0, &TransformsData, 0, 0);
+
+	struct VS_MatProperties_BUFFER
+	{
+		DirectX::XMFLOAT3 SpecularAlbedo;
+		float SpecularPower;
+	};
+
+	VS_MatProperties_BUFFER MatPropertiesData;
+	MatPropertiesData.SpecularAlbedo = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
+	MatPropertiesData.SpecularPower = 0.5;
+
+	D3D11_BUFFER_DESC cbMatDesc;
+	cbMatDesc.ByteWidth = sizeof(VS_TRANSFORMS_BUFFER);
+	cbMatDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbMatDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbMatDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbMatDesc.MiscFlags = 0;
+	cbMatDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA InitMatData;
+	InitMatData.pSysMem = &TransformsData;
+	InitMatData.SysMemPitch = 0;
+	InitMatData.SysMemSlicePitch = 0;
+	dev->CreateBuffer(&cbTDesc, &InitMatData, &gConstantBuffers[1]);
+
+	devcon->UpdateSubresource(gConstantBuffers[1], 0, 0, &MatPropertiesData, 0, 0);
+}
+
+void CreateConstantBufferForP2()
+{
+	XMMATRIX world = XMMatrixRotationX(0);
+	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
+	XMMATRIX worldViewProj = world * player.view * proj;
+
+	struct VS_LIGHTS_BUFFER
+	{
+		XMMATRIX worldViewProj;
+		XMMATRIX world;
+	};
+
+	VS_LIGHTS_BUFFER LightsData;
+	LightsData.worldViewProj = worldViewProj;
+	LightsData.world = world;
+
+	D3D11_BUFFER_DESC cbLightsDesc;
+	cbLightsDesc.ByteWidth = sizeof(D3D11_BUFFER_DESC);
+	cbLightsDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbLightsDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbLightsDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbLightsDesc.MiscFlags = 0;
+	cbLightsDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA InitLightsData;
+	InitLightsData.pSysMem = &LightsData;
+	InitLightsData.SysMemPitch = 0;
+	InitLightsData.SysMemSlicePitch = 0;
+	dev->CreateBuffer(&cbLightsDesc, &InitLightsData, &gConstantBuffers[0]);
+
+	devcon->UpdateSubresource(gConstantBuffers[0], 0, 0, &InitLightsData, 0, 0);
+
+	struct VS_Camera_BUFFER
+	{
+		DirectX::XMFLOAT3 SpecularAlbedo;
+		float SpecularPower;
+	};
+
+	VS_Camera_BUFFER CameraData;
+	CameraData.SpecularAlbedo = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
+	CameraData.SpecularPower = 0.5;
+
+	D3D11_BUFFER_DESC cbCameraDesc;
+	cbCameraDesc.ByteWidth = sizeof(D3D11_BUFFER_DESC);
+	cbCameraDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbCameraDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbCameraDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbCameraDesc.MiscFlags = 0;
+	cbCameraDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA InitCameraData;
+	InitCameraData.pSysMem = &CameraData;
+	InitCameraData.SysMemPitch = 0;
+	InitCameraData.SysMemSlicePitch = 0;
+	dev->CreateBuffer(&cbCameraDesc, &InitCameraData, &gConstantBuffers[1]);
+
+	devcon->UpdateSubresource(gConstantBuffers[1], 0, 0, &InitCameraData, 0, 0);
 }
 
 void InitD3D(HWND hWnd)
@@ -421,7 +505,7 @@ void InitD3D(HWND hWnd)
 
 	//ShowCursor(false);
 
-	InitPipeline();
+	InitPipeline1();
 }
 
 // Render single frame
@@ -430,7 +514,9 @@ void RenderFrame(void)
 	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	devcon->ClearRenderTargetView(backbuffer, clearColor);
 	devcon->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffer);
+	devcon->VSSetConstantBuffers(0, 2, gConstantBuffers);
+
+	InitPipeline1();
 
 	//select heightmap buffer
 	UINT stride = sizeof(Model::Vertex);
@@ -454,6 +540,33 @@ void RenderFrame(void)
 	//devcon->PSSetShaderResources(0, 1, &modelHandler.getModels()[0].pSRV);
 
 	if(!modelHandler.getVertices().empty())
+		devcon->Draw(modelHandler.getVertices().size(), 0);
+
+	InitPipeline2();
+	CreateConstantBufferForP2();
+
+	//select heightmap buffer
+	stride = sizeof(Model::Vertex);
+	offset = 0;
+	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
+	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	shaders1[2];
+	shaders1[0] = hm.pSRV;
+	shaders1[1] = hm.bmpMapView;
+	devcon->PSSetShaderResources(0, 2, shaders1);
+
+	devcon->DrawIndexed(hm.getIndices().size(), 0, 0);
+
+	//select model buffer
+	stride = sizeof(Model::Vertex);
+	offset = 0;
+	devcon->IASetVertexBuffers(0, 1, &pVBuffer2, &stride, &offset);
+	devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//devcon->PSSetShaderResources(0, 1, &modelHandler.getModels()[0].pSRV);
+
+	if (!modelHandler.getVertices().empty())
 		devcon->Draw(modelHandler.getVertices().size(), 0);
 	swapchain->Present(0, 0);
 }
@@ -540,16 +653,47 @@ void InitGraphics()
 }
 
 // Loads and prepares the shaders
-void InitPipeline()
+void InitPipeline1()
 {
 	ID3D10Blob *VS, *PS;
-	D3DCompileFromFile(L"Effects.fx", 0, 0, "VShader", "vs_4_0", 0, 0, &VS, 0);
-	D3DCompileFromFile(L"Effects.fx", 0, 0, "PShader", "ps_4_0", 0, 0, &PS, 0);
+	D3DCompileFromFile(L"DefP1.fx", 0, 0, "VSMain", "vs_4_0", 0, 0, &VS, 0);
+	D3DCompileFromFile(L"DefP1.fx", 0, 0, "PSMain", "ps_4_0", 0, 0, &PS, 0);
 	
 	dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
 	dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
 
 	devcon->VSSetShader(pVS, 0, 0);
+	devcon->PSSetShader(pPS, 0, 0);
+
+	/*
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORDS0;
+	float3 Normal : NORMAL;
+	float4 Tangent : TANGENT;
+	*/
+	D3D11_INPUT_ELEMENT_DESC ied[] =
+	{
+		{ "Position", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TexCoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "Tangent", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+	
+	HRESULT hr = dev->CreateInputLayout(ied, 4, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
+	devcon->IASetInputLayout(pLayout);
+}
+
+// Loads and prepares the shaders
+void InitPipeline2()
+{
+	ID3D10Blob *VS, *PS;
+	//D3DCompileFromFile(L"DefP2.fx", 0, 0, "VSMain", "vs_4_0", 0, 0, &VS, 0);
+	D3DCompileFromFile(L"DefP2.fx", 0, 0, "PSMain", "ps_4_0", 0, 0, &PS, 0);
+
+	//dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
+	dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
+
+	//devcon->VSSetShader(pVS, 0, 0);
 	devcon->PSSetShader(pPS, 0, 0);
 
 	D3D11_INPUT_ELEMENT_DESC ied[] =
@@ -558,9 +702,9 @@ void InitPipeline()
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 52, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 52, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
-	
-	dev->CreateInputLayout(ied, 5, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
-	devcon->IASetInputLayout(pLayout);
+
+	//dev->CreateInputLayout(ied, 0, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
+	//devcon->IASetInputLayout(pLayout);
 }

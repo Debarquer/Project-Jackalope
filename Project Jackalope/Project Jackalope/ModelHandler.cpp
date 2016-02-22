@@ -57,10 +57,6 @@ void ModelHandler::addModel(DirectX::XMFLOAT3* positions, DWORD numVertices)
 		vertex.nY = 1;
 		vertex.nZ = 0;
 
-		vertex.r = 0;
-		vertex.g = 1;
-		vertex.b = 0;
-
 		vertices.push_back(vertex);
 		mAllVertices.push_back(vertex);
 	}

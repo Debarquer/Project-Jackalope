@@ -64,6 +64,12 @@
     <FxCompile Include="Effects.fx">
       <Filter>Source Files</Filter>
     </FxCompile>
+    <FxCompile Include="DefP1.fx">
+      <Filter>Source Files</Filter>
+    </FxCompile>
+    <FxCompile Include="DefP2.fx">
+      <Filter>Source Files</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Text.txt">

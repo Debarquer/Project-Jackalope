@@ -16,10 +16,19 @@ private:
 public:
 	//Model(Model& other);
 
+	/*
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORDS0;
+	float3 Normal : NORMAL;
+	float4 Tangent : TANGENT;
+	*/
 	struct Vertex
 	{
-		float pX, pY, pZ, r, g, b, w,
-			nX, nY, nZ, u, v, tX, tY, tZ;
+		float 
+			pX, pY, pZ, pW,
+			u, v,
+			nX, nY, nZ,
+			tX, tY, tZ, tW;
 	};
 
 	std::string materialFile;

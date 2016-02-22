@@ -37,6 +37,7 @@ void HeightMap::CreateGrid(HeightMapInfo & hminfo, std::vector<Model::Vertex>& v
 				vertex.pX = hminfo.heightMap[i*cols + j].x;
 				vertex.pY = hminfo.heightMap[i*cols + j].y;
 				vertex.pZ = hminfo.heightMap[i*cols + j].z;
+				vertex.pW = 1;
 				vertex.nX = 0.0f;
 				vertex.nY = 1.0f;
 				vertex.nZ = 0.0f;
@@ -139,7 +140,6 @@ bool HeightMap::HeightMapLoad(char * filename, HeightMapInfo & hminfo, ID3D11Dev
 	HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grass.png", nullptr, &pSRV);
 	HRESULT hr2 = DirectX::CreateWICTextureFromFile(dev, L"grassNormal.png", nullptr, &bmpMapView);
 	return true;
-
 }
 
 void HeightMap::calculateNormals()
@@ -248,6 +248,7 @@ void HeightMap::CalcTangent()
 		v[i].tX = XMVectorGetX(tangentSum);
 		v[i].tY = XMVectorGetY(tangentSum);
 		v[i].tZ = XMVectorGetZ(tangentSum);
+		v[i].tW = 0;
 
 		normalSum = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 		tangentSum = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);

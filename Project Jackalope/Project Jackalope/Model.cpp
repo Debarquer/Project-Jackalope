@@ -119,11 +119,7 @@ Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev,
 		vertex.pX = tempVertices[vertexIndex - 1].x;
 		vertex.pY = tempVertices[vertexIndex - 1].y;
 		vertex.pZ = tempVertices[vertexIndex - 1].z;
-
-		vertex.r = 1;
-		vertex.g = 0;
-		vertex.b = 0;
-		vertex.w = 1;
+		vertex.pW = 1;
 
 		unsigned int normalIndex = normalIndices[i];
 		vertex.nX = tempNormals[normalIndex - 1].x;
