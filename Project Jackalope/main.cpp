@@ -96,11 +96,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	bool failed;
 	//modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev, devcon));
-	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
+	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed, dev, devcon));
 	hm.HeightMapLoad("heightmap.bmp", hmInfo, dev);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
 	hm.calculateNormals();
-	//hm.CalcTangent();
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 	CreateSampler();
 	InitGraphics();
