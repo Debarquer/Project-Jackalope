@@ -2,7 +2,7 @@
 
 Model::Model()
 {
-	pSRV = nullptr;
+	mPSRV = nullptr;
 }
 
 //Model::Model(Model& other)
@@ -18,7 +18,7 @@ Model::~Model()
 //**DEPRECATED?**
 void Model::LoadModel(Model& other)
 {
-	this->material = other.material;
+	this->mMaterialName = other.mMaterialName;
 	this->mVertices = other.mVertices;
 }
 
@@ -33,7 +33,7 @@ DirectX::XMFLOAT3 Model::cross(DirectX::XMFLOAT3 v1, DirectX::XMFLOAT3 v2)
 	return output;
 }
 
-Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev, ID3D11DeviceContext* devcon)
+Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev)
 {
 	bool hadMaterialFile, hadMaterial;
 	failed = false;
@@ -79,14 +79,14 @@ Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev,
 		{
 			char tmpFilePath[128];
 			fscanf(file, "%s", &tmpFilePath);
-			model.materialFile = tmpFilePath;
+			model.mMaterialFile = tmpFilePath;
 			hadMaterialFile = true;
 		}
 		else if (strcmp(lineHeader, "usemtl") == 0)
 		{
 			char tmpFileName[128];
 			fscanf(file, "%s", &tmpFileName);
-			model.material = tmpFileName;
+			model.mMaterialName = tmpFileName;
 			hadMaterial = true;
 		}
 		else if (strcmp(lineHeader, "f") == 0)
@@ -140,17 +140,71 @@ Model Model::LoadTextFile(std::string filename, bool &failed, ID3D11Device* dev,
 	}
 	else
 	{
-		std::string fileName = "";
-		filename = model.materialFile.substr(0, model.materialFile.size() - 4);
-		filename += ".png";
-
-		wchar_t* wide_string = new wchar_t[filename.length() + 1];
-		std::copy(filename.begin(), filename.end(), wide_string);
-		wide_string[filename.length()] = 0;
-
-		HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grass.png", nullptr, &model.pSRV);
+		LoadMaterialFile(model, dev);
 	}
 
 	fclose(file);
 	return model;
+}
+
+void Model::LoadMaterialFile(Model& model, ID3D11Device* dev)
+{
+	FILE* file = fopen(model.mMaterialFile.c_str(), "r");
+	if (file == NULL)
+	{
+		return;
+	}
+
+	bool correctMaterial = false;
+	while (true)
+	{
+		char lineHeader[128];
+
+		int res = fscanf(file, "%s", lineHeader);
+		if (res == EOF)
+			break;
+
+		if(strcmp(lineHeader, "newmtl"))
+		{ 
+			if (lineHeader == model.mMaterialName)
+			{
+				correctMaterial = true;
+				fscanf(file, "%s\n", &model.mMaterial.materialName);
+			}
+		}
+		else if (strcmp(lineHeader, "illum"))
+		{
+			if (correctMaterial)
+			{
+				std::string tmp = lineHeader;
+				fscanf(file, "%d\n", &model.mMaterial.illum);
+			}
+		}
+		else if (strcmp(lineHeader, "Ka"))
+		{
+			fscanf(file, "%f %f %f\n", &model.mMaterial.Ka.x, &model.mMaterial.Ka.y, &model.mMaterial.Ka.z);
+		}
+		else if (strcmp(lineHeader, "Kd"))
+		{
+			fscanf(file, "%f %f %f\n", &model.mMaterial.Kd.x, &model.mMaterial.Kd.y, &model.mMaterial.Kd.z);
+		}
+		else if (strcmp(lineHeader, "Ks"))
+		{
+			fscanf(file, "%f %f %f\n", &model.mMaterial.Ks.x, &model.mMaterial.Ks.y, &model.mMaterial.Ks.z);
+		}
+		else if (strcmp(lineHeader, "Ns"))
+		{
+			fscanf(file, "%f\n", &model.mMaterial.Ns);
+		}
+		else if (strcmp(lineHeader, "map_Kd"))
+		{
+			fscanf(file, "%s\n", &model.mMaterial.texFileName);
+		}
+	}
+
+	wchar_t* wide_string = new wchar_t[model.mMaterial.texFileName.length() + 1];
+	std::copy(model.mMaterial.texFileName.begin(), model.mMaterial.texFileName.end(), wide_string);
+	wide_string[model.mMaterial.texFileName.length()] = 0;
+
+	HRESULT hr = DirectX::CreateWICTextureFromFile(dev, L"grass.png", nullptr, &model.mPSRV);
 }

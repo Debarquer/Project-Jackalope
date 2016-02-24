@@ -41,13 +41,19 @@ ID3D11PixelShader *pPS = nullptr;
 ID3D11Buffer *pVBuffer = nullptr;
 ID3D11Buffer *pVBuffer2 = nullptr;
 ID3D11Buffer *pIBuffer = nullptr;
-ID3D11Buffer** gConstantBuffers = new ID3D11Buffer[2];
-gConstantBuffers[0] = nullptr;
-gConstantBuffers[1] = nullptr;
+ID3D11Buffer* gConstantBuffers = nullptr;
+ID3D11Buffer* gBuffer = nullptr;
 ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer = nullptr;
 ID3D11RasterizerState* rasterState = nullptr;
 ID3D11DepthStencilState* depthStencilState = nullptr;
+
+ID3D11RenderTargetView* t0V = nullptr;
+ID3D11RenderTargetView* t1V = nullptr;
+ID3D11RenderTargetView* t2V = nullptr;
+ID3D11RenderTargetView* t3V = nullptr;
+
+std::vector<ID3D11RenderTargetView*> gBuffers;
 
 float angle = 0.0f;
 
@@ -97,8 +103,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//Load models
 	bool failed;
-	modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev, devcon));
-	//modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed));
+	//modelHandler.addModel(Model::LoadTextFile("cubeTex.obj", failed, dev));
+	modelHandler.addModel(Model::LoadTextFile("Stormtrooper.obj", failed, dev));
 	hm.HeightMapLoad("heightmap.bmp", hmInfo, dev);
 	hm.CreateGrid(hmInfo, hm.getV(),hm.getIndices());
 	hm.calculateNormals();
@@ -171,10 +177,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				player.yaw(-1, dt);
 			}
 
-			CreateConstantBufferForP1();
 			RenderFrame();
-			gConstantBuffers[0]->Release();
-			gConstantBuffers[1]->Release();
+			gConstantBuffers->Release();
 
 			clock_t diffTime = clock() - prevTime;
 			dt = (float)(diffTime) / CLOCKS_PER_SEC;
@@ -261,124 +265,119 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
-void CreateConstantBufferForP1()
+void CreateConstantBufferForP1(Model model, bool hasModel)
 {
 	XMMATRIX world = XMMatrixRotationX(0);
 	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
 	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
 	XMMATRIX worldViewProj = world * player.view * proj;
 	
-	struct VS_TRANSFORMS_BUFFER
+	struct VS_CONSTANT_BUFFER
 	{
-		XMMATRIX worldViewProj;
-		XMMATRIX world;
-	};
-
-	VS_TRANSFORMS_BUFFER TransformsData;
-	TransformsData.worldViewProj = worldViewProj;
-	TransformsData.world = world;
-
-	D3D11_BUFFER_DESC cbTDesc;
-	cbTDesc.ByteWidth = sizeof(VS_TRANSFORMS_BUFFER);
-	cbTDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cbTDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbTDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cbTDesc.MiscFlags = 0;
-	cbTDesc.StructureByteStride = 0;
-
-	D3D11_SUBRESOURCE_DATA InitTransformData;
-	InitTransformData.pSysMem = &TransformsData;
-	InitTransformData.SysMemPitch = 0;
-	InitTransformData.SysMemSlicePitch = 0;
-	dev->CreateBuffer(&cbTDesc, &InitTransformData, &gConstantBuffers[0]);
-
-	devcon->UpdateSubresource(gConstantBuffers[0], 0, 0, &TransformsData, 0, 0);
-
-	struct VS_MatProperties_BUFFER
-	{
-		DirectX::XMFLOAT3 SpecularAlbedo;
+		XMMATRIX WorldViewProjMatrix;
+		XMMATRIX WorldMatrix;
+		XMFLOAT3 SpecularAlbedo;
 		float SpecularPower;
 	};
 
-	VS_MatProperties_BUFFER MatPropertiesData;
-	MatPropertiesData.SpecularAlbedo = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
-	MatPropertiesData.SpecularPower = 0.5;
+	VS_CONSTANT_BUFFER ConstantData;
+	ConstantData.WorldViewProjMatrix = worldViewProj;
+	ConstantData.WorldMatrix = world;
+	if (hasModel)
+	{
+		ConstantData.SpecularAlbedo = model.mMaterial.Ka;
+		ConstantData.SpecularPower = model.mMaterial.Ns;
+	}
+	else
+	{
+		ConstantData.SpecularAlbedo = XMFLOAT3{ 0.5f, 0.5f, 0.5f };
+		ConstantData.SpecularPower = 0.5f;
+	}
 
-	D3D11_BUFFER_DESC cbMatDesc;
-	cbMatDesc.ByteWidth = sizeof(VS_TRANSFORMS_BUFFER);
-	cbMatDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cbMatDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbMatDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cbMatDesc.MiscFlags = 0;
-	cbMatDesc.StructureByteStride = 0;
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER);
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA InitMatData;
-	InitMatData.pSysMem = &TransformsData;
-	InitMatData.SysMemPitch = 0;
-	InitMatData.SysMemSlicePitch = 0;
-	dev->CreateBuffer(&cbTDesc, &InitMatData, &gConstantBuffers[1]);
+	D3D11_SUBRESOURCE_DATA InitData;
+	InitData.pSysMem = &ConstantData;
+	InitData.SysMemPitch = 0;
+	InitData.SysMemSlicePitch = 0;
+	dev->CreateBuffer(&cbDesc, &InitData, &gConstantBuffers);
 
-	devcon->UpdateSubresource(gConstantBuffers[1], 0, 0, &MatPropertiesData, 0, 0);
+	D3D11_TEXTURE2D_DESC tDesc;
+	tDesc.Width = SCREEN_WIDTH;
+	tDesc.Height = SCREEN_HEIGHT;
+	tDesc.MipLevels = tDesc.ArraySize = 1;
+	tDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	tDesc.SampleDesc.Count = 1;
+	tDesc.Usage = D3D11_USAGE_DYNAMIC;
+	tDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
+	tDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE || D3D11_CPU_ACCESS_READ;
+	tDesc.MiscFlags = 0;
+
+	ID3D11Texture2D *t0 = NULL;
+	ID3D11Texture2D *t1 = NULL;
+	ID3D11Texture2D *t2 = NULL;
+	ID3D11Texture2D *t3 = NULL;
+
+	dev->CreateTexture2D(&tDesc, NULL, &t0);
+	dev->CreateTexture2D(&tDesc, NULL, &t1);
+	dev->CreateTexture2D(&tDesc, NULL, &t2);
+	dev->CreateTexture2D(&tDesc, NULL, &t3);
+
+	D3D11_RENDER_TARGET_VIEW_DESC tVDesc;
+	tVDesc.Format = DXGI_FORMAT_R8G8B8A8_TYPELESS;
+	tVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	D3D11_TEX2D_RTV tex2d;
+	tex2d.MipSlice = 0;
+	tVDesc.Texture2D = tex2d;
+
+	dev->CreateRenderTargetView(t0, &tVDesc, &t0V);
+	dev->CreateRenderTargetView(t1, &tVDesc, &t1V);
+	dev->CreateRenderTargetView(t2, &tVDesc, &t2V);
+	dev->CreateRenderTargetView(t3, &tVDesc, &t3V);
+
+	gBuffers.push_back(t0V);
+	gBuffers.push_back(t1V);
+	gBuffers.push_back(t2V);
+	gBuffers.push_back(t3V);
+
+	devcon->OMSetRenderTargets(4, gBuffers.data(), NULL);
+
+	devcon->UpdateSubresource(gConstantBuffers, 0, 0, &ConstantData, 0, 0);
 }
 
 void CreateConstantBufferForP2()
 {
-	XMMATRIX world = XMMatrixRotationX(0);
-	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
-	XMMATRIX worldViewProj = world * player.view * proj;
-
-	struct VS_LIGHTS_BUFFER
+	struct VS_CONSTANT_BUFFER
 	{
-		XMMATRIX worldViewProj;
-		XMMATRIX world;
+		XMVECTOR cameraPos;
 	};
 
-	VS_LIGHTS_BUFFER LightsData;
-	LightsData.worldViewProj = worldViewProj;
-	LightsData.world = world;
+	VS_CONSTANT_BUFFER ConstData;
+	ConstData.cameraPos = player.camera;
 
-	D3D11_BUFFER_DESC cbLightsDesc;
-	cbLightsDesc.ByteWidth = sizeof(D3D11_BUFFER_DESC);
-	cbLightsDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cbLightsDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbLightsDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cbLightsDesc.MiscFlags = 0;
-	cbLightsDesc.StructureByteStride = 0;
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER);
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA InitLightsData;
-	InitLightsData.pSysMem = &LightsData;
-	InitLightsData.SysMemPitch = 0;
-	InitLightsData.SysMemSlicePitch = 0;
-	dev->CreateBuffer(&cbLightsDesc, &InitLightsData, &gConstantBuffers[0]);
+	D3D11_SUBRESOURCE_DATA InitData;
+	InitData.pSysMem = &ConstData;
+	InitData.SysMemPitch = 0;
+	InitData.SysMemSlicePitch = 0;
+	HRESULT hrg = dev->CreateBuffer(&cbDesc, &InitData, &gConstantBuffers);
 
-	devcon->UpdateSubresource(gConstantBuffers[0], 0, 0, &InitLightsData, 0, 0);
+	devcon->OMSetRenderTargets(1, &backbuffer, NULL);
 
-	struct VS_Camera_BUFFER
-	{
-		DirectX::XMFLOAT3 SpecularAlbedo;
-		float SpecularPower;
-	};
-
-	VS_Camera_BUFFER CameraData;
-	CameraData.SpecularAlbedo = DirectX::XMFLOAT3(1.0, 1.0, 1.0);
-	CameraData.SpecularPower = 0.5;
-
-	D3D11_BUFFER_DESC cbCameraDesc;
-	cbCameraDesc.ByteWidth = sizeof(D3D11_BUFFER_DESC);
-	cbCameraDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cbCameraDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbCameraDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cbCameraDesc.MiscFlags = 0;
-	cbCameraDesc.StructureByteStride = 0;
-
-	D3D11_SUBRESOURCE_DATA InitCameraData;
-	InitCameraData.pSysMem = &CameraData;
-	InitCameraData.SysMemPitch = 0;
-	InitCameraData.SysMemSlicePitch = 0;
-	dev->CreateBuffer(&cbCameraDesc, &InitCameraData, &gConstantBuffers[1]);
-
-	devcon->UpdateSubresource(gConstantBuffers[1], 0, 0, &InitCameraData, 0, 0);
+	devcon->UpdateSubresource(gConstantBuffers, 0, 0, &InitData, 0, 0);
 }
 
 void InitD3D(HWND hWnd)
@@ -487,8 +486,8 @@ void InitD3D(HWND hWnd)
 	hr = dev->CreateDepthStencilView(depthStencilBuffer, &descDSV, &depthStencilView);
 
 	// Bind depth stencil view
-	devcon->OMSetRenderTargets(1, &backbuffer, NULL);
-	devcon->OMSetRenderTargets(1, &backbuffer, depthStencilView);
+	//devcon->OMSetRenderTargets(1, &backbuffer, NULL);
+	//devcon->OMSetRenderTargets(1, &backbuffer, depthStencilView);
 
 	// Set the viewport
 	D3D11_VIEWPORT viewport;
@@ -514,7 +513,6 @@ void RenderFrame(void)
 	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	devcon->ClearRenderTargetView(backbuffer, clearColor);
 	devcon->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	devcon->VSSetConstantBuffers(0, 2, gConstantBuffers);
 
 	InitPipeline1();
 
@@ -529,6 +527,8 @@ void RenderFrame(void)
 	shaders1[1] = hm.bmpMapView;
 	devcon->PSSetShaderResources(0, 2, shaders1);
 
+	CreateConstantBufferForP1(Model(), false);
+	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffers);
 	devcon->DrawIndexed(hm.getIndices().size(), 0, 0);
 
 	//select model buffer
@@ -537,13 +537,19 @@ void RenderFrame(void)
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer2, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//devcon->PSSetShaderResources(0, 1, &modelHandler.getModels()[0].pSRV);
-
-	if(!modelHandler.getVertices().empty())
-		devcon->Draw(modelHandler.getVertices().size(), 0);
+	int startLocation = 0;
+	for (int i = 0; i < modelHandler.getModels().size(); i++)
+	{
+		CreateConstantBufferForP1(modelHandler.getModels()[i], true);
+		devcon->VSSetConstantBuffers(0, 1, &gConstantBuffers);
+		devcon->PSSetShaderResources(0, 1, &modelHandler.getModels()[i].mPSRV);
+		devcon->Draw(modelHandler.getModels()[i].mVertices.size(), startLocation);
+		startLocation += modelHandler.getModels()[i].mVertices.size();
+	}
 
 	InitPipeline2();
 	CreateConstantBufferForP2();
+	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffers);
 
 	//select heightmap buffer
 	stride = sizeof(Model::Vertex);
@@ -585,7 +591,7 @@ void CleanD3D(void)
 	dev->Release();
 	devcon->Release();
 	pBackBuffer->Release();
-	//gConstantBuffer->Release();
+	//gConstantBuffer->ReleaseO
 	depthStencilView->Release();
 	depthStencilBuffer->Release();
 	//rasterState->Release();
