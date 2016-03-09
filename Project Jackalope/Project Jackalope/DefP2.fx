@@ -3,6 +3,16 @@ Texture2D DiffuseAlbedoTexture : register (t1);
 Texture2D SpecularAlbedoTexture : register(t2);
 Texture2D PositionTexture : register(t3);
 
+struct VSInput
+{
+	float4 Position : POSITION;
+};
+
+struct VSOutput
+{
+	float4 PositionCS : SV_Position;
+};
+
 cbuffer LightParams
 {
 	float3 LightPos;
@@ -15,6 +25,7 @@ cbuffer LightParams
 cbuffer CameraParams
 {
 	float3 CameraPos;
+	matrix WorldViewProjMatrix;
 };
 
 void GetGBufferAttributes(in float2 screenPos, out float3 normal, out float3 position, out float3 diffuseAlbedo, out float3 specularAlbedo, out float specularPower)
@@ -63,6 +74,14 @@ float3 CalculateLightning(in float3 normal, in float3 position, in float3 diffus
 	return (diffuse + specular) * attenuation;
 }
 
+VSOutput VSMain(in VSInput input)
+{
+	VSOutput output;
+	output.PositionCS = input.Position;// mul(input.Position, WorldViewProjMatrix);
+
+	return output;
+}
+
 float4 PSMain(in float4 screenPos : SV_Position) : SV_Target0
 {
 	float3 normal;
@@ -74,5 +93,7 @@ float4 PSMain(in float4 screenPos : SV_Position) : SV_Target0
 	GetGBufferAttributes(screenPos.xy, normal, position, diffuseAlbedo, specularAlbedo, specularPower);
 	float3 lightning = CalculateLightning(normal, position, diffuseAlbedo, specularAlbedo, specularPower);
 
-	return float4(lightning, 1.0f);
+	//return float4(lightning, 1.0f);
+
+	return float4(1.0, 0.0, 0.0, 1.0);
 }

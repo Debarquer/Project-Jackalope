@@ -30,6 +30,16 @@ public:
 			u, v,
 			nX, nY, nZ,
 			tX, tY, tZ, tW;
+
+		Vertex()
+		{
+			pX = pY = pZ = u = v = nX = nY = nZ = tX = tY = tZ = tW = 0;
+		}
+		Vertex(float pX, float pY, float pZ, float pW,
+			float u, float v,
+			float nX, float nY, float nZ,
+			float tX, float tY, float tZ, float tW) : pX(pX), pY(pY), pZ(pZ), pW(pW), u(u), v(v), nX(nX), nY(nY), nZ(nZ), tX(tX), tY(tY), tZ(tZ), tW(tW) {}
+
 	};
 
 	struct Material

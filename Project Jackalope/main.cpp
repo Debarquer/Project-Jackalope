@@ -16,6 +16,8 @@
 
 using namespace DirectX;
 
+std::vector<Model::Vertex> quadVertices;
+
 ModelHandler modelHandler;
 HeightMap hm;
 HeightMap::HeightMapInfo hmInfo;
@@ -47,12 +49,12 @@ ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer = nullptr;
 ID3D11RasterizerState* rasterState = nullptr;
 ID3D11DepthStencilState* depthStencilState = nullptr;
-
 ID3D11RenderTargetView* t0V = nullptr;
 ID3D11RenderTargetView* t1V = nullptr;
 ID3D11RenderTargetView* t2V = nullptr;
 ID3D11RenderTargetView* t3V = nullptr;
 
+std::vector<ID3D11ShaderResourceView*> SRVs(4);
 std::vector<ID3D11RenderTargetView*> gBuffers;
 
 float angle = 0.0f;
@@ -110,7 +112,73 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	hm.calculateNormals();
 	//modelHandler.addModel(hmInfo.heightMap, hmInfo.numVertices);
 
-	InitGraphics();
+	D3D11_TEXTURE2D_DESC tDesc;
+	tDesc.Width = SCREEN_WIDTH;
+	tDesc.Height = SCREEN_HEIGHT;
+	tDesc.MipLevels = tDesc.ArraySize = 1;
+	tDesc.ArraySize = 1;
+	tDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	tDesc.SampleDesc.Count = 0;
+	tDesc.SampleDesc.Quality = 0;
+	tDesc.Usage = D3D11_USAGE_DEFAULT;
+	tDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	tDesc.CPUAccessFlags = 0;
+	tDesc.MiscFlags = 0;
+
+	ID3D11Texture2D *t0 = NULL;
+	ID3D11Texture2D *t1 = NULL;
+	ID3D11Texture2D *t2 = NULL;
+	ID3D11Texture2D *t3 = NULL;
+
+	HRESULT stuff = dev->CreateTexture2D(&tDesc, NULL, &t0);
+	stuff = dev->CreateTexture2D(&tDesc, NULL, &t1);
+	stuff = dev->CreateTexture2D(&tDesc, NULL, &t2);
+	stuff = dev->CreateTexture2D(&tDesc, NULL, &t3);
+
+	D3D11_RENDER_TARGET_VIEW_DESC tVDesc;
+	tVDesc.Format = DXGI_FORMAT_R32G32B32A32_TYPELESS;
+	tVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	tVDesc.Texture2D.MipSlice = 0;
+
+	stuff = dev->CreateRenderTargetView(t0, &tVDesc, &t0V);
+	stuff = dev->CreateRenderTargetView(t1, &tVDesc, &t1V);
+	stuff = dev->CreateRenderTargetView(t2, &tVDesc, &t2V);
+	stuff = dev->CreateRenderTargetView(t3, &tVDesc, &t3V);
+	
+	if (t0 != nullptr && t1 != nullptr && t2 != nullptr && t3 != nullptr)
+	{
+		t0->Release();
+		t1->Release();
+		t2->Release();
+		t3->Release();
+	}
+	
+	gBuffers.push_back(t0V);
+	gBuffers.push_back(t1V);
+	gBuffers.push_back(t2V);
+	gBuffers.push_back(t3V);
+
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
+	shaderDesc.Format = tDesc.Format;
+	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+	shaderDesc.Texture2D.MostDetailedMip = 0;
+	shaderDesc.Texture2D.MipLevels = 1;
+
+	dev->CreateShaderResourceView(t0, &shaderDesc, &SRVs[0]);
+	dev->CreateShaderResourceView(t1, &shaderDesc, &SRVs[1]);
+	dev->CreateShaderResourceView(t2, &shaderDesc, &SRVs[2]);
+	dev->CreateShaderResourceView(t3, &shaderDesc, &SRVs[3]);
+
+	quadVertices.push_back(Model::Vertex(-SCREEN_WIDTH/2, -SCREEN_HEIGHT, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+	quadVertices.push_back(Model::Vertex(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+	quadVertices.push_back(Model::Vertex(-SCREEN_WIDTH, SCREEN_HEIGHT, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+	quadVertices.push_back(Model::Vertex(-SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+	quadVertices.push_back(Model::Vertex(SCREEN_WIDTH, -SCREEN_HEIGHT, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+	quadVertices.push_back(Model::Vertex(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+
+	InitTerrain();
+	InitModelGraphics();
 
 	light.r = 1;
 	light.g = 1;
@@ -308,44 +376,6 @@ void CreateConstantBufferForP1(Model model, bool hasModel)
 	InitData.SysMemSlicePitch = 0;
 	dev->CreateBuffer(&cbDesc, &InitData, &gConstantBuffers);
 
-	D3D11_TEXTURE2D_DESC tDesc;
-	tDesc.Width = SCREEN_WIDTH;
-	tDesc.Height = SCREEN_HEIGHT;
-	tDesc.MipLevels = tDesc.ArraySize = 1;
-	tDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	tDesc.SampleDesc.Count = 1;
-	tDesc.Usage = D3D11_USAGE_DYNAMIC;
-	tDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
-	tDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE || D3D11_CPU_ACCESS_READ;
-	tDesc.MiscFlags = 0;
-
-	ID3D11Texture2D *t0 = NULL;
-	ID3D11Texture2D *t1 = NULL;
-	ID3D11Texture2D *t2 = NULL;
-	ID3D11Texture2D *t3 = NULL;
-
-	dev->CreateTexture2D(&tDesc, NULL, &t0);
-	dev->CreateTexture2D(&tDesc, NULL, &t1);
-	dev->CreateTexture2D(&tDesc, NULL, &t2);
-	dev->CreateTexture2D(&tDesc, NULL, &t3);
-
-	D3D11_RENDER_TARGET_VIEW_DESC tVDesc;
-	tVDesc.Format = DXGI_FORMAT_R8G8B8A8_TYPELESS;
-	tVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	D3D11_TEX2D_RTV tex2d;
-	tex2d.MipSlice = 0;
-	tVDesc.Texture2D = tex2d;
-
-	dev->CreateRenderTargetView(t0, &tVDesc, &t0V);
-	dev->CreateRenderTargetView(t1, &tVDesc, &t1V);
-	dev->CreateRenderTargetView(t2, &tVDesc, &t2V);
-	dev->CreateRenderTargetView(t3, &tVDesc, &t3V);
-
-	gBuffers.push_back(t0V);
-	gBuffers.push_back(t1V);
-	gBuffers.push_back(t2V);
-	gBuffers.push_back(t3V);
-
 	devcon->OMSetRenderTargets(4, gBuffers.data(), NULL);
 
 	devcon->UpdateSubresource(gConstantBuffers, 0, 0, &ConstantData, 0, 0);
@@ -353,13 +383,20 @@ void CreateConstantBufferForP1(Model model, bool hasModel)
 
 void CreateConstantBufferForP2()
 {
+	XMMATRIX world = XMMatrixRotationX(0);
+	player.view = XMMatrixLookToLH(player.camera, player.lookAt, XMVECTOR{ 0, 1, 0 });
+	XMMATRIX proj = XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.5, 1000.0);
+	XMMATRIX worldViewProj = world * player.view * proj;
+
 	struct VS_CONSTANT_BUFFER
 	{
 		XMVECTOR cameraPos;
+		XMMATRIX WorldViewProjMatrix;
 	};
 
 	VS_CONSTANT_BUFFER ConstData;
 	ConstData.cameraPos = player.camera;
+	ConstData.WorldViewProjMatrix = worldViewProj;
 
 	D3D11_BUFFER_DESC cbDesc;
 	cbDesc.ByteWidth = sizeof(VS_CONSTANT_BUFFER);
@@ -504,12 +541,16 @@ void InitD3D(HWND hWnd)
 
 	//ShowCursor(false);
 
+	//swapchain->SetFullscreenState(TRUE, NULL);
+
 	InitPipeline1();
 }
 
 // Render single frame
 void RenderFrame(void)
 {
+	InitModelGraphics();
+
 	float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	devcon->ClearRenderTargetView(backbuffer, clearColor);
 	devcon->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -548,21 +589,13 @@ void RenderFrame(void)
 	}
 
 	InitPipeline2();
+	InitQuad();
 	CreateConstantBufferForP2();
-	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffers);
-
-	//select heightmap buffer
-	stride = sizeof(Model::Vertex);
-	offset = 0;
-	devcon->IASetVertexBuffers(0, 1, &pVBuffer, &stride, &offset);
-	devcon->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	shaders1[2];
 	shaders1[0] = hm.pSRV;
 	shaders1[1] = hm.bmpMapView;
-	devcon->PSSetShaderResources(0, 2, shaders1);
-
-	devcon->DrawIndexed(hm.getIndices().size(), 0, 0);
+	//devcon->PSSetShaderResources(0, 2, shaders1);
 
 	//select model buffer
 	stride = sizeof(Model::Vertex);
@@ -570,10 +603,10 @@ void RenderFrame(void)
 	devcon->IASetVertexBuffers(0, 1, &pVBuffer2, &stride, &offset);
 	devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//devcon->PSSetShaderResources(0, 1, &modelHandler.getModels()[0].pSRV);
+	devcon->VSSetConstantBuffers(0, 1, &gConstantBuffers);
+	devcon->PSSetShaderResources(0, 1, SRVs.data());
+	devcon->Draw(quadVertices.size(), 0);
 
-	if (!modelHandler.getVertices().empty())
-		devcon->Draw(modelHandler.getVertices().size(), 0);
 	swapchain->Present(0, 0);
 }
 
@@ -598,8 +631,7 @@ void CleanD3D(void)
 	depthStencilState->Release();
 }
 
-// Create shapes to render
-void InitGraphics()
+void InitTerrain()
 {
 	// create the index buffer
 	D3D11_BUFFER_DESC ibd;
@@ -620,10 +652,10 @@ void InitGraphics()
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 
-	bd.Usage = D3D11_USAGE_DEFAULT;                
-	bd.ByteWidth = sizeof(Model::Vertex)*hmInfo.numVertices;           
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       
-	bd.CPUAccessFlags = 0;   
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.ByteWidth = sizeof(Model::Vertex)*hmInfo.numVertices;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = 0;
 	bd.MiscFlags = 0;
 	D3D11_SUBRESOURCE_DATA vertexBufferData;
 	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
@@ -631,7 +663,9 @@ void InitGraphics()
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
 	HRESULT hr = dev->CreateBuffer(&bd, &vertexBufferData, &pVBuffer);
-
+}
+void InitModelGraphics()
+{
 	D3D11_BUFFER_DESC bd2;
 	ZeroMemory(&bd2, sizeof(bd2));
 
@@ -647,13 +681,40 @@ void InitGraphics()
 	vertexBufferData2.pSysMem = modelHandler.getVertices().data();
 	vertexBufferData2.SysMemPitch = 0;
 	vertexBufferData2.SysMemSlicePitch = 0;
-	hr = dev->CreateBuffer(&bd2, &vertexBufferData2, &pVBuffer2);
+	HRESULT hr = dev->CreateBuffer(&bd2, &vertexBufferData2, &pVBuffer2);
 
 	if (!modelHandler.getVertices().empty())
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
 		HRESULT HArgh = devcon->Map(pVBuffer2, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
 		memcpy(ms.pData, modelHandler.getVertices().data(), sizeof(Model::Vertex)*modelHandler.getVertices().size());
+		devcon->Unmap(pVBuffer2, NULL);
+	}
+}
+void InitQuad()
+{
+	D3D11_BUFFER_DESC bd2;
+	ZeroMemory(&bd2, sizeof(bd2));
+
+	bd2.Usage = D3D11_USAGE_DYNAMIC;
+	bd2.ByteWidth = sizeof(Model::Vertex)*quadVertices.size();
+	bd2.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd2.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bd2.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData2;
+	ZeroMemory(&vertexBufferData2, sizeof(vertexBufferData2));
+
+	vertexBufferData2.pSysMem = quadVertices.data();
+	vertexBufferData2.SysMemPitch = 0;
+	vertexBufferData2.SysMemSlicePitch = 0;
+	HRESULT hr = dev->CreateBuffer(&bd2, &vertexBufferData2, &pVBuffer2);
+
+	if (!quadVertices.empty())
+	{
+		D3D11_MAPPED_SUBRESOURCE ms;
+		HRESULT HArgh = devcon->Map(pVBuffer2, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+		memcpy(ms.pData, quadVertices.data(), sizeof(Model::Vertex)*quadVertices.size());
 		devcon->Unmap(pVBuffer2, NULL);
 	}
 }
@@ -665,6 +726,11 @@ void InitPipeline1()
 	D3DCompileFromFile(L"DefP1.fx", 0, 0, "VSMain", "vs_4_0", 0, 0, &VS, 0);
 	D3DCompileFromFile(L"DefP1.fx", 0, 0, "PSMain", "ps_4_0", 0, 0, &PS, 0);
 	
+	if (pVS != nullptr)
+		pVS->Release();
+	if(pPS != nullptr)
+		pPS->Release();
+
 	dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
 	dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
 
@@ -692,25 +758,26 @@ void InitPipeline1()
 // Loads and prepares the shaders
 void InitPipeline2()
 {
-	ID3D10Blob *VS, *PS;
-	//D3DCompileFromFile(L"DefP2.fx", 0, 0, "VSMain", "vs_4_0", 0, 0, &VS, 0);
+	ID3D10Blob *VS, *PS, *error;
+	HRESULT hr = D3DCompileFromFile(L"DefP2.fx", 0, 0, "VSMain", "vs_4_0", 0, 0, &VS, &error);
 	D3DCompileFromFile(L"DefP2.fx", 0, 0, "PSMain", "ps_4_0", 0, 0, &PS, 0);
 
-	//dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
+	if (pVS != nullptr)
+		pVS->Release();
+	if (pPS != nullptr)
+		pPS->Release();
+
+	dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
 	dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
 
-	//devcon->VSSetShader(pVS, 0, 0);
+	devcon->VSSetShader(pVS, 0, 0);
 	devcon->PSSetShader(pPS, 0, 0);
 
 	D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 52, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-	//dev->CreateInputLayout(ied, 0, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
-	//devcon->IASetInputLayout(pLayout);
+	dev->CreateInputLayout(ied, 1, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
+	devcon->IASetInputLayout(pLayout);
 }
