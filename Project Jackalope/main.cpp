@@ -116,9 +116,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	tDesc.Width = SCREEN_WIDTH;
 	tDesc.Height = SCREEN_HEIGHT;
 	tDesc.MipLevels = tDesc.ArraySize = 1;
-	tDesc.ArraySize = 1;
 	tDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	tDesc.SampleDesc.Count = 0;
+	tDesc.SampleDesc.Count = 1;
 	tDesc.SampleDesc.Quality = 0;
 	tDesc.Usage = D3D11_USAGE_DEFAULT;
 	tDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
@@ -136,7 +135,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	stuff = dev->CreateTexture2D(&tDesc, NULL, &t3);
 
 	D3D11_RENDER_TARGET_VIEW_DESC tVDesc;
-	tVDesc.Format = DXGI_FORMAT_R32G32B32A32_TYPELESS;
+	tVDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	tVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	tVDesc.Texture2D.MipSlice = 0;
 
@@ -161,11 +160,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
 	shaderDesc.Format = tDesc.Format;
-	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderDesc.Texture2D.MostDetailedMip = 0;
 	shaderDesc.Texture2D.MipLevels = 1;
 
-	dev->CreateShaderResourceView(t0, &shaderDesc, &SRVs[0]);
+	HRESULT srv = dev->CreateShaderResourceView(t0, &shaderDesc, &SRVs[0]);
 	dev->CreateShaderResourceView(t1, &shaderDesc, &SRVs[1]);
 	dev->CreateShaderResourceView(t2, &shaderDesc, &SRVs[2]);
 	dev->CreateShaderResourceView(t3, &shaderDesc, &SRVs[3]);
@@ -722,17 +721,17 @@ void InitQuad()
 // Loads and prepares the shaders
 void InitPipeline1()
 {
+	if (pVS != nullptr)
+		pVS->Release();
+	if (pPS != nullptr)
+		pPS->Release();
+
 	ID3D10Blob *VS, *PS;
 	D3DCompileFromFile(L"DefP1.fx", 0, 0, "VSMain", "vs_4_0", 0, 0, &VS, 0);
 	D3DCompileFromFile(L"DefP1.fx", 0, 0, "PSMain", "ps_4_0", 0, 0, &PS, 0);
-	
-	if (pVS != nullptr)
-		pVS->Release();
-	if(pPS != nullptr)
-		pPS->Release();
 
-	dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
-	dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
+	HRESULT vsstuff = dev->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &pVS);
+	vsstuff = dev->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &pPS);
 
 	devcon->VSSetShader(pVS, 0, 0);
 	devcon->PSSetShader(pPS, 0, 0);
@@ -745,10 +744,10 @@ void InitPipeline1()
 	*/
 	D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
-		{ "Position", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TexCoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "Normal", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "Tangent", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORDS", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	
 	HRESULT hr = dev->CreateInputLayout(ied, 4, VS->GetBufferPointer(), VS->GetBufferSize(), &pLayout);
